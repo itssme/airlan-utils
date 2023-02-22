@@ -563,7 +563,8 @@ def get_account(username: str):
             password=os.getenv("DB_PASSWORD", "pass")) as conn:
         with conn.cursor() as cursor:
             cursor.execute("select * from account where \"username\" = %s", (username,))
-            return DbObjImpl[Account]().from_tuple(cursor.fetchall()[0])
+            users = cursor.fetchall()
+            return DbObjImpl[Account]().from_tuple(users[0]) if len(users) == 1 else None
 
 
 def delete_account(username: str):
@@ -599,20 +600,23 @@ def get_todos(username: str) -> List[Dict]:
             "status": "Fertig",
             "desc": "Registriere dich auf dieser Plattform."
         },
-        {  # spieler
+        {  # team name
             "completed": team.name != f"{username}'s team" and team.tag != "tag",
             "title": "Team Namen Angeben",
-            "desc": "Füge alle fünf Spieler zu deinem Team hinzu."
+            "desc": "Gib den Namen und den Tag deinen Teams an.",
+            "route": "/public/team/registration"
         },
-        {  # spieler
+        {  # player
             "completed": len(players) == 5,
             "title": "Spieler Hinzufügen",
-            "desc": "Füge alle fünf Spieler zu deinem Team hinzu."
+            "desc": "Füge alle fünf Spieler zu deinem Team hinzu.",
+            "route": "/public/team/registration"
         },
         {  # paid registration fee
             "completed": team.paid_registration_fee == 1,
             "title": "Teilnahmegebühr Zahlen",
-            "desc": "Überweise die Teilnahmegebühr und warte auf die Bestätigung."
+            "desc": "Überweise die Teilnahmegebühr und warte auf die Bestätigung.",
+            "route": "/public/team/fee"
         },
         {  # verified
             "completed": team.verified == 1,
