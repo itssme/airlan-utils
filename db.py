@@ -2,7 +2,7 @@ import json
 import logging
 import os
 import time
-from typing import List, TypeVar, Generic
+from typing import List, TypeVar, Generic, Dict
 
 import psycopg2
 
@@ -67,12 +67,16 @@ class Player(DbObject):
 
 
 class Team(DbObject):
-    def __init__(self, id: int = None, tag: str = "", name: str = "", elo: int = 0, competing: int = 0):
+    def __init__(self, id: int = None, tag: str = "", name: str = "", elo: int = 0, competing: int = 0,
+                 paid_registration_fee: int = 0, verified: int = 0, account: str = "noacc"):
         self.id: int = id
         self.tag: str = tag
         self.name: str = name
         self.elo: int = elo
         self.competing: int = competing
+        self.paid_registration_fee: int = paid_registration_fee
+        self.verified: int = verified
+        self.account: str = account
 
 
 class Server(DbObject):
@@ -110,7 +114,13 @@ class Stats(DbObject):
         self.type: int = type
 
 
-T = TypeVar("T", Player, Team, Server, Match, Stats)
+class Account(DbObject):
+    def __init__(self, username: str = None, password: str = None):
+        self.username: str = username
+        self.password: str = password
+
+
+T = TypeVar("T", Player, Team, Server, Match, Stats, Account)
 
 
 class DbObjImpl(Generic[T]):
@@ -529,3 +539,84 @@ def delete_host(host_ip: str):
             password=os.getenv("DB_PASSWORD", "pass")) as conn:
         with conn.cursor() as cursor:
             cursor.execute("delete from host where ip = %s", (host_ip,))
+
+
+def insert_account(username: str, password: str):
+    with psycopg2.connect(
+            host=os.getenv("DB_HOST", "db"),
+            database="postgres",
+            user="postgres",
+            password=os.getenv("DB_PASSWORD", "pass")) as conn:
+        with conn.cursor() as cursor:
+            cursor.execute("insert into account (\"username\", \"password\") values (%s, %s)", (username, password))
+
+        team = Team(None, "tag", f"{username}'s team", account=username)
+        with conn.cursor() as cursor:
+            team.insert_into_db_with_cursor(cursor)
+
+
+def get_account(username: str):
+    with psycopg2.connect(
+            host=os.getenv("DB_HOST", "db"),
+            database="postgres",
+            user="postgres",
+            password=os.getenv("DB_PASSWORD", "pass")) as conn:
+        with conn.cursor() as cursor:
+            cursor.execute("select * from account where \"username\" = %s", (username,))
+            return DbObjImpl[Account]().from_tuple(cursor.fetchall()[0])
+
+
+def delete_account(username: str):
+    with psycopg2.connect(
+            host=os.getenv("DB_HOST", "db"),
+            database="postgres",
+            user="postgres",
+            password=os.getenv("DB_PASSWORD", "pass")) as conn:
+        with conn.cursor() as cursor:
+            cursor.execute("delete from account where \"username\" = %s", (username,))
+
+
+def get_team_id_by_account(username: str) -> int:
+    with psycopg2.connect(
+            host=os.getenv("DB_HOST", "db"),
+            database="postgres",
+            user="postgres",
+            password=os.getenv("DB_PASSWORD", "pass")) as conn:
+        with conn.cursor() as cursor:
+            cursor.execute("select id from team where \"account\" = %s", (username,))
+            return cursor.fetchall()[0][0]
+
+
+def get_todos(username: str) -> List[Dict]:
+    team_id = get_team_id_by_account(username)
+    team = get_team_by_id(team_id)
+    players = get_team_players(team_id)
+
+    return [
+        {  # registration
+            "completed": True,
+            "title": "Registrieren",
+            "status": "Fertig",
+            "desc": "Registriere dich auf dieser Plattform."
+        },
+        {  # spieler
+            "completed": team.name != f"{username}'s team" and team.tag != "tag",
+            "title": "Team Namen Angeben",
+            "desc": "Füge alle fünf Spieler zu deinem Team hinzu."
+        },
+        {  # spieler
+            "completed": len(players) == 5,
+            "title": "Spieler Hinzufügen",
+            "desc": "Füge alle fünf Spieler zu deinem Team hinzu."
+        },
+        {  # paid registration fee
+            "completed": team.paid_registration_fee == 1,
+            "title": "Teilnahmegebühr Zahlen",
+            "desc": "Überweise die Teilnahmegebühr und warte auf die Bestätigung."
+        },
+        {  # verified
+            "completed": team.verified == 1,
+            "title": "Team Angenommen",
+            "desc": "Warte bis die Veranstalter deine Daten nochmals geprüft haben und dich zum Turnier freischalten."
+        }
+    ]
