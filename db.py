@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+import random
 import time
 from typing import List, TypeVar, Generic, Dict
 
@@ -68,13 +69,15 @@ class Player(DbObject):
 
 class Team(DbObject):
     def __init__(self, id: int = None, tag: str = "", name: str = "", elo: int = 0, competing: int = 0,
-                 paid_registration_fee: int = 0, verified: int = 0, account: str = "noacc"):
+                 paid_registration_fee: int = 0, registration_fee_rnd: str = "", verified: int = 0,
+                 account: str = "noacc"):
         self.id: int = id
         self.tag: str = tag
         self.name: str = name
         self.elo: int = elo
         self.competing: int = competing
         self.paid_registration_fee: int = paid_registration_fee
+        self.registration_fee_rnd: str = registration_fee_rnd
         self.verified: int = verified
         self.account: str = account
 
@@ -136,6 +139,7 @@ class DbObjImpl(Generic[T]):
         return self.__orig_class__.__args__[0](*tuple)
 
 
+@DeprecationWarning
 def setup_db():
     if os.getenv("MASTER", "1") != "1":
         logging.info("Not a master instance, wont create tables in db and ignore teams.json")
@@ -550,7 +554,12 @@ def insert_account(username: str, password: str):
         with conn.cursor() as cursor:
             cursor.execute("insert into account (\"username\", \"password\") values (%s, %s)", (username, password))
 
-        team = Team(None, "tag", f"{username}'s team", account=username)
+        team = Team(None, "tag", f"{username}'s team",
+                    account=username,
+                    registration_fee_rnd="".join(
+                        [random.choice(
+                            [chr(random.randint(48, 57)), chr(random.randint(65, 90)), chr(random.randint(97, 122))]
+                        ) for _ in range(0, 10)]))
         with conn.cursor() as cursor:
             team.insert_into_db_with_cursor(cursor)
 
