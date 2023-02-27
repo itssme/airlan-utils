@@ -6,8 +6,6 @@ from typing import List, TypeVar, Generic, Dict
 
 import psycopg2
 
-from utils import steam
-
 
 class DbObject(object):
     def tuple(self):
@@ -360,16 +358,6 @@ def get_team_players(team_id: int) -> List[Player]:
             return [DbObjImpl[Player]().from_tuple(player) for player in players]
 
 
-def get_team_steam_profiles(team_id: int) -> list[steam.SteamUser]:
-    players = get_team_players(team_id)
-    player_steam_ids = [player.steam_id for player in players]
-    steam_profiles = steam.get_profiles(player_steam_ids)
-
-    steam_profiles.sort(key=lambda x: x.steam_id)
-
-    return steam_profiles
-
-
 def get_servers() -> List[Server]:
     with psycopg2.connect(
             host=os.getenv("DB_HOST", "db"),
@@ -619,7 +607,7 @@ def get_todos(username: str) -> List[Dict]:
             "route": "/public/team/registration"
         },
         {  # player
-            "completed": len(players) >= 5,
+            "completed": len(players) == 5,
             "title": "Spieler Hinzufügen",
             "desc": "Füge alle fünf Spieler zu deinem Team hinzu.",
             "route": "/public/team/add_members"

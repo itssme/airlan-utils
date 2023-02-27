@@ -1,7 +1,10 @@
+import logging
 import os
 from typing import List, Optional
 
 import requests
+
+import utils.db
 
 STEAM_API_KEY = os.getenv("STEAM_KEY")
 
@@ -46,8 +49,9 @@ def get_steam_id(profile_url: str) -> Optional[str]:
         profile_id = components[-1]
 
         if url_type == "id":
+            params = {"key": STEAM_API_KEY, "vanityurl": profile_id}
             request = requests.get(
-                f"http://api.steampowered.com/ISteamUser/ResolveVanityURL/v0001/?key={STEAM_API_KEY}&vanityurl={profile_id}"
+                f"http://api.steampowered.com/ISteamUser/ResolveVanityURL/v0001/", params=params
             )
             response = request.json()
             if response["response"]["success"] == 1:
@@ -59,23 +63,35 @@ def get_steam_id(profile_url: str) -> Optional[str]:
         else:
             return None
     except Exception as e:
-        print(f"Error when getting steam id for profile url: \"{profile_url}\":\n{e}")
+        logging.error(f"Error when getting steam id for profile url: \"{profile_url}\":\n{e}")
         return None
 
 
+def get_team_steam_profiles(team_id: int) -> list[SteamUser]:
+    players = db.get_team_players(team_id)
+    player_steam_ids = [player.steam_id for player in players]
+    steam_profiles = get_profiles(player_steam_ids)
+
+    steam_profiles.sort(key=lambda x: x.steam_id)
+
+    return steam_profiles
+
+
 def get_profiles(steam_ids: List[str]) -> list[SteamUser]:
-    i = 0
-    while i < len(steam_ids):
+    for i in range(0, len(steam_ids)):
         steam_id = steam_ids[i]
         if steam_id.startswith("STEAM_0"):
             steam_ids[i] = community_id_to_steam_id(steam_id)
         i += 1
 
+    params = {"key": STEAM_API_KEY, "steamids": ";".join(steam_ids)}
     request = requests.get(
-        f"https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?"
-        f"key={STEAM_API_KEY}&" 
-        f"steamids={';'.join(steam_ids)}"
+        f"https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002", params=params
     )
+
+    if request.status_code != 200:
+        logging.error(f"Error when getting steam profiles: {request.status_code}, {request.text}")
+        return []
 
     response = request.json()
 
