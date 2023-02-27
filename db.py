@@ -630,7 +630,7 @@ def get_todos(username: str) -> List[Dict]:
             "completed": len(players) == 5,
             "title": "Spieler Hinzufügen",
             "desc": "Füge alle fünf Spieler zu deinem Team hinzu.",
-            "route": "/public/team/registration"
+            "route": "/public/team/add_members"
         },
         {  # paid registration fee
             "completed": team.paid_registration_fee == 1,
