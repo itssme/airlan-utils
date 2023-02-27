@@ -3,7 +3,7 @@ import logging
 import os
 import random
 import time
-from typing import List, TypeVar, Generic, Dict
+from typing import List, TypeVar, Generic, Dict, Optional
 
 import psycopg2
 
@@ -118,9 +118,10 @@ class Stats(DbObject):
 
 
 class Account(DbObject):
-    def __init__(self, username: str = None, password: str = None):
+    def __init__(self, username: str = None, password: str = None, role: str = "user"):
         self.username: str = username
         self.password: str = password
+        self.role: str = role
 
 
 T = TypeVar("T", Player, Team, Server, Match, Stats, Account)
@@ -311,7 +312,7 @@ def get_player_by_steam_id(player_steam_id: str):
             return DbObjImpl[Player]().from_tuple(player_tuple)
 
 
-def get_team_by_id(team_id: int) -> Team:
+def get_team_by_id(team_id: int) -> Optional[Team]:
     with psycopg2.connect(
             host=os.getenv("DB_HOST", "db"),
             database="postgres",
@@ -319,8 +320,12 @@ def get_team_by_id(team_id: int) -> Team:
             password=os.getenv("DB_PASSWORD", "pass")) as conn:
         with conn.cursor() as cursor:
             cursor.execute("select * from team where id = %s", (team_id,))
-            team_tuple = cursor.fetchall()[0]
-            return DbObjImpl[Team]().from_tuple(team_tuple)
+
+            teams = cursor.fetchall()
+            if len(teams) == 0:
+                return None
+
+            return DbObjImpl[Team]().from_tuple(teams[0])
 
 
 def get_teams() -> List[Team]:
@@ -586,7 +591,7 @@ def delete_account(username: str):
             cursor.execute("delete from account where \"username\" = %s", (username,))
 
 
-def get_team_id_by_account(username: str) -> int:
+def get_team_id_by_account(username: str) -> Optional[int]:
     with psycopg2.connect(
             host=os.getenv("DB_HOST", "db"),
             database="postgres",
@@ -594,11 +599,17 @@ def get_team_id_by_account(username: str) -> int:
             password=os.getenv("DB_PASSWORD", "pass")) as conn:
         with conn.cursor() as cursor:
             cursor.execute("select id from team where \"account\" = %s", (username,))
-            return cursor.fetchall()[0][0]
+
+            team_ids = cursor.fetchall()
+            return team_ids[0][0] if len(team_ids) == 1 else None
 
 
 def get_todos(username: str) -> List[Dict]:
     team_id = get_team_id_by_account(username)
+
+    if team_id is None:
+        return []
+
     team = get_team_by_id(team_id)
     players = get_team_players(team_id)
 
