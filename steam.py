@@ -4,7 +4,7 @@ from typing import List, Optional
 
 import requests
 
-import utils.db
+from utils import db
 
 STEAM_API_KEY = os.getenv("STEAM_KEY")
 
@@ -82,7 +82,6 @@ def get_profiles(steam_ids: List[str]) -> list[SteamUser]:
         steam_id = steam_ids[i]
         if steam_id.startswith("STEAM_0"):
             steam_ids[i] = community_id_to_steam_id(steam_id)
-        i += 1
 
     params = {"key": STEAM_API_KEY, "steamids": ";".join(steam_ids)}
     request = requests.get(
