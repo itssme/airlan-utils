@@ -6,7 +6,10 @@ import requests
 
 from utils import db
 
-STEAM_API_KEY = os.getenv("STEAM_KEY")
+STEAM_API_KEY = os.getenv("STEAM_KEY", "DEV")
+
+if STEAM_API_KEY == "DEV":
+    logging.warning("No steam api key found, disabling steam features")
 
 
 class SteamUser:
@@ -39,6 +42,9 @@ def community_id_to_steam_id(community_id: str) -> Optional[str]:
 
 
 def get_steam_id(profile_url: str) -> Optional[str]:
+    if STEAM_API_KEY == "DEV":
+        return None
+
     try:
         if profile_url.endswith("/"):
             profile_url = profile_url[:-1]
@@ -78,6 +84,9 @@ def get_team_steam_profiles(team_id: int) -> list[SteamUser]:
 
 
 def get_profiles(steam_ids: List[str]) -> list[SteamUser]:
+    if STEAM_API_KEY == "DEV":
+        return []
+
     for i in range(0, len(steam_ids)):
         steam_id = steam_ids[i]
         if steam_id.startswith("STEAM_0"):
