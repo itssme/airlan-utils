@@ -61,10 +61,15 @@ class DbObject(object):
 
 
 class Player(DbObject):
-    def __init__(self, id: int = None, name: str = "", steam_id: str = ""):
+    def __init__(self, id: int = None, name: str = "", steam_id: str = "", steam_name: str = "", profile_url: str = "",
+                 avatar_url: str = "", last_updated: int = 0):
         self.id: int = id
         self.name: str = name
         self.steam_id: str = steam_id
+        self.steam_name: str = steam_name
+        self.profile_url: str = profile_url
+        self.avatar_url: str = avatar_url
+        self.last_updated: int = last_updated
 
 
 class Team(DbObject):
@@ -361,7 +366,7 @@ def get_team_players(team_id: int) -> List[Player]:
             password=os.getenv("DB_PASSWORD", "pass")) as conn:
         with conn.cursor() as cursor:
             cursor.execute(
-                "select player.id, player.name, player.steam_id from player join team_assignment on player.id = team_assignment.player where team_assignment.team = %s",
+                "select player.* from player join team_assignment on player.id = team_assignment.player where team_assignment.team = %s",
                 (team_id,))
             players = cursor.fetchall()
             return [DbObjImpl[Player]().from_tuple(player) for player in players]

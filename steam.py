@@ -12,14 +12,6 @@ if STEAM_API_KEY == "DEV":
     logging.warning("No steam api key found, disabling steam features")
 
 
-class SteamUser:
-    def __init__(self, steam_id, name, avatar_url, profile_url):
-        self.steam_id = steam_id
-        self.name = name
-        self.avatar_url = avatar_url
-        self.profile_url = profile_url
-
-
 def steam_id_to_community_id(steam_id: str) -> Optional[str]:
     if steam_id is None:
         return None
@@ -73,7 +65,7 @@ def get_steam_id(profile_url: str) -> Optional[str]:
         return None
 
 
-def get_team_steam_profiles(team_id: int) -> list[SteamUser]:
+def get_team_steam_profiles(team_id: int) -> List[db.Player]:
     players = db.get_team_players(team_id)
     player_steam_ids = [player.steam_id for player in players]
     steam_profiles = get_profiles(player_steam_ids)
@@ -83,7 +75,7 @@ def get_team_steam_profiles(team_id: int) -> list[SteamUser]:
     return steam_profiles
 
 
-def get_profiles(steam_ids: List[str]) -> list[SteamUser]:
+def get_profiles(steam_ids: List[str]) -> List[db.Player]:
     if STEAM_API_KEY == "DEV":
         return []
 
@@ -103,13 +95,13 @@ def get_profiles(steam_ids: List[str]) -> list[SteamUser]:
 
     response = request.json()
 
-    profiles = []
+    profiles: List[db.Player] = []
     for player in response["response"]["players"]:
         steam_id = player["steamid"]
         name = player["personaname"]
         avatar_url = player["avatarfull"]
         profile_url = player["profileurl"]
 
-        profiles.append(SteamUser(steam_id, name, avatar_url, profile_url))
+        profiles.append(db.Player(steam_id=steam_id, steam_name=name, avatar_url=avatar_url, profile_url=profile_url))
 
     return profiles
