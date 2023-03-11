@@ -618,30 +618,37 @@ def get_todos(username: str) -> List[Dict]:
     team = get_team_by_id(team_id)
     players = get_team_players(team_id)
 
+    team_name_completed = team.name != f"{username}'s team" and team.tag != "tag"
+    player_locked = not team_name_completed
+
+    player_completed = len(players) == 5
+    registration_locked = not player_completed
+
     return [
         {  # registration
             "completed": True,
             "title": "Registrieren",
-            "status": "Fertig",
             "desc": "Registriere dich auf dieser Plattform."
         },
         {  # team name
-            "completed": team.name != f"{username}'s team" and team.tag != "tag",
+            "completed": team_name_completed,
             "title": "Team Namen Angeben",
             "desc": "Gib den Namen und den Tag deinen Teams an.",
             "route": "/public/team/registration"
         },
         {  # player
-            "completed": len(players) == 5,
+            "completed": player_completed,
             "title": "Spieler Hinzufügen",
             "desc": "Füge alle fünf Spieler zu deinem Team hinzu.",
-            "route": "/public/team/add_members"
+            "route": "/public/team/add_members",
+            "locked": player_locked
         },
         {  # paid registration fee
             "completed": team.paid_registration_fee == 1,
             "title": "Teilnahmegebühr Zahlen",
             "desc": "Überweise die Teilnahmegebühr und warte auf die Bestätigung.",
-            "route": "/public/team/fee"
+            "route": "/public/team/fee",
+            "locked": registration_locked
         },
         {  # verified
             "completed": team.verified == 1,
