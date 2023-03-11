@@ -635,14 +635,16 @@ def get_todos(username: str) -> List[Dict]:
             "completed": team_name_completed,
             "title": "Team Namen Angeben",
             "desc": "Gib den Namen und den Tag deinen Teams an.",
-            "route": "/public/team/registration"
+            "route": "/public/team/registration",
+            "display_only": team.locked_changes
         },
         {  # player
             "completed": player_completed,
             "title": "Spieler Hinzufügen",
             "desc": "Füge alle fünf Spieler zu deinem Team hinzu.",
             "route": "/public/team/add_members",
-            "locked": player_locked
+            "locked": player_locked,
+            "display_only": team.locked_changes
         },
         {  # paid registration fee
             "completed": team.paid_registration_fee == 1,
