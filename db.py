@@ -659,3 +659,32 @@ def get_todos(username: str) -> List[Dict]:
             "desc": "Warte bis die Veranstalter deine Daten nochmals geprüft haben und dich zum Turnier freischalten."
         }
     ]
+
+
+def get_rules():
+    rules = [
+        {"id": 1, "rule": "Teams", "subrules":
+            [
+                "Ein Team besteht aus genau fünf Spielern.",
+                "Ein Spieler kann nur in einem Team sein.",
+                "Jedes Teeam hat einen Teamleiter. Dieser muss das Team auf dieser Plattform registrieren."
+            ]
+         },
+        {"id": 2, "rule": "ELO-System", "subrules":
+            [
+                "Jedes Team hat einen ELO-Wert, der die Stärke des Teams angibt. Alle Teams starten mit einem ELO Wert von 1000.",
+                "Nach jedem Spiel wird der ELO-Wert des Teams angepasst. Dabei wird der ELO-Wert des Gegners berücksichtigt, sowie der Unterschied der Scores. (ähnlich wie bei der ELO-Ratingliste im Schach)"
+            ]
+         },
+        {"id": 3, "rule": "Finale", "subrules":
+            [
+                "Die besten vier Teams (jene mit der höchsten ELO) spielen im Finale gegeneinander."
+            ]
+         },
+        {"id": 4, "rule": "Spielmodus", "subrules":
+            [
+                "Das Tunier wird im ELO-System begonnen."
+            ]
+         }
+    ]
+    return rules
