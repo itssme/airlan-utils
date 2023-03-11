@@ -75,7 +75,7 @@ class Player(DbObject):
 class Team(DbObject):
     def __init__(self, id: int = None, tag: str = "", name: str = "", elo: int = 0, competing: int = 0,
                  paid_registration_fee: int = 0, registration_fee_rnd: str = "", verified: int = 0,
-                 account: str = "noacc"):
+                 account: str = "noacc", locked_changes: int = 0):
         self.id: int = id
         self.tag: str = tag
         self.name: str = name
@@ -85,6 +85,7 @@ class Team(DbObject):
         self.registration_fee_rnd: str = registration_fee_rnd
         self.verified: int = verified
         self.account: str = account
+        self.locked_changes: int = locked_changes
 
 
 class Server(DbObject):
