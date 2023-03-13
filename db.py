@@ -667,7 +667,8 @@ def get_rules():
             [
                 "Ein Team besteht aus genau fünf Spielern.",
                 "Ein Spieler kann nur in einem Team sein.",
-                "Jedes Teeam hat einen Teamleiter. Dieser muss das Team auf dieser Plattform registrieren."
+                "Jedes Team hat einen Teamleiter. Dieser muss das Team auf dieser Plattform registrieren.",
+                "Im Tunier werden zehn Teams gegeneinandern antreten."
             ]
          },
         {"id": 2, "rule": "ELO-System", "subrules":
