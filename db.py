@@ -75,7 +75,7 @@ class Player(DbObject):
 class Team(DbObject):
     def __init__(self, id: int = None, tag: str = "", name: str = "", elo: int = 0, competing: int = 0,
                  paid_registration_fee: int = 0, registration_fee_rnd: str = "", verified: int = 0,
-                 account: str = "noacc", locked_changes: int = 0):
+                 account: str = "noacc", locked_changes: int = 0, sponsored: int = 0):
         self.id: int = id
         self.tag: str = tag
         self.name: str = name
@@ -86,6 +86,7 @@ class Team(DbObject):
         self.verified: int = verified
         self.account: str = account
         self.locked_changes: int = locked_changes
+        self.sponsored: int = sponsored
 
 
 class Server(DbObject):
@@ -625,6 +626,10 @@ def get_todos(username: str) -> List[Dict]:
     player_completed = len(players) == 5
     registration_locked = not player_completed
 
+    registration_fee_completed = team.paid_registration_fee
+    if team.sponsored:
+        registration_fee_completed = True
+
     return [
         {  # registration
             "completed": True,
@@ -647,9 +652,9 @@ def get_todos(username: str) -> List[Dict]:
             "display_only": team.locked_changes
         },
         {  # paid registration fee
-            "completed": team.paid_registration_fee == 1,
+            "completed": registration_fee_completed,
             "title": "Teilnahmegebühr Zahlen",
-            "desc": "Überweise die Teilnahmegebühr und warte auf die Bestätigung.",
+            "desc": "Überweise die Teilnahmegebühr und warte auf die Bestätigung." if not team.sponsored else "Geponsortes team, keine Teilnahmegebühr fällig.",
             "route": "/public/team/fee",
             "locked": registration_locked
         },
