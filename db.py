@@ -673,6 +673,7 @@ def get_rules():
                 "Ein Team besteht aus genau fünf Spielern.",
                 "Ein Spieler kann nur in einem Team sein.",
                 "Jedes Team hat einen Teamleiter. Dieser muss das Team auf dieser Plattform registrieren.",
+                "Der Teamleader ist für das Auswählen der Karten während des Spiels verantwortlich.",
                 "Im Tunier werden zehn Teams gegeneinandern antreten."
             ]
          },
@@ -684,12 +685,30 @@ def get_rules():
          },
         {"id": 3, "rule": "Finale", "subrules":
             [
-                "Die besten vier Teams (jene mit der höchsten ELO) spielen im Finale gegeneinander."
+                "Die besten zwei Teams (jene mit der höchsten ELO) spielen im Finale gegeneinander.",
+                "Das Finale wird ein normales Match zwischen den beiden Teams sein, welches für alle anderen Tunierteilnehmer übertragen wird."
             ]
          },
         {"id": 4, "rule": "Spielmodus", "subrules":
-            [
+            [  # TODO: add veto, roundtime etc.
                 "Das Tunier wird im ELO-System begonnen."
+            ]
+         },
+        {"id": 5, "rule": "Turnierausschluss begründende Umstände", "subrules":
+            [
+                "Alle Programme oder andere nicht technischen Hilfsmittel, welche einem Spieler, oder einem Team als ganzes, einen Vorteil gegenüber anderen Teams verschaffen, sind verboten. Ausgenommen sind Programme welche im allgemeinen Verständnis der CSGO Spieler nicht als Cheats angesehen werden, wie unter anderem Programme zur Kommunikation mit den anderen Spielern außerhalb des ingame-chats, wie Discord oder Teamspeak.",
+                "Modifikationen, die innerhalb des CSGO Clients stattfinden, wie unter anderem Jump-Throw-Binds, sind erlaubt.",
+                "Das Angreifen des Servers oder der Clients anderer Spieler ist verboten, dazu zählen insbesondere, DDOS Attacken oder ähnliches.",
+                "Wenn ein Spieler des Teams gegen die Regeln des §5 verstößt, wird das gesamte Team disqualifiziert und der Spieler wird für alle zukünftigen Turniere gesperrt.",
+                "Sollte ein Spieler wegen eines Verstoßes gegen die Regeln des §5 disqualifiziert werden, behalten wir es uns als Veranstalter vor, den betreffenden Spieler nach § 146 StGB wegen Betrugs anzuzeigen.",
+            ]
+         },
+        {"id": 6, "rule": "Allgemeine Turnierregeln", "subrules":
+            [
+                "Die Regeln des Turniers werden auf dieser Plattform veröffentlicht und können jederzeit geändert werden.",
+                "Alle Spiele werden aufgenommen und die Demo Dateien anschliessend veröffentlicht.",
+                "Der Teamleiter hat all seine Spieler über die hier veröffentlichen Regeln zu Unterrichten. Unwissenheit über Regeln sind dem Team anzulasten.",
+                "Teams, welche sich unsportliche Verhalten, oder andere Spieler oder Teams, in einer verletzenden Art und Weise beleidigen, welche selbst für den in CSGO herrschenden rauen Umgangston unüblich ist, werden bis zu 250 ELO Punkte abgezogen, oder in besonders schwerwiegenden Fällen vom Turnier ausgeschlossen.",
             ]
          }
     ]
