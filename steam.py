@@ -4,7 +4,7 @@ from typing import List, Optional
 
 import requests
 
-from utils import db
+from utils import db, db_models
 
 STEAM_API_KEY = os.getenv("STEAM_KEY", "DEV")
 
@@ -65,7 +65,7 @@ def get_steam_id(profile_url: str) -> Optional[str]:
         return None
 
 
-def get_team_steam_profiles(team_id: int) -> List[db.Player]:
+def get_team_steam_profiles(team_id: int) -> List[db_models.Player]:
     players = db.get_team_players(team_id)
     player_steam_ids = [player.steam_id for player in players]
     steam_profiles = get_profiles(player_steam_ids)
@@ -75,7 +75,7 @@ def get_team_steam_profiles(team_id: int) -> List[db.Player]:
     return steam_profiles
 
 
-def get_profiles(steam_ids: List[str]) -> List[db.Player]:
+def get_profiles(steam_ids: List[str]) -> List[db_models.Player]:
     if STEAM_API_KEY == "DEV":
         return []
 
@@ -95,13 +95,14 @@ def get_profiles(steam_ids: List[str]) -> List[db.Player]:
 
     response = request.json()
 
-    profiles: List[db.Player] = []
+    profiles: List[db_models.Player] = []
     for player in response["response"]["players"]:
         steam_id = player["steamid"]
         name = player["personaname"]
         avatar_url = player["avatarfull"]
         profile_url = player["profileurl"]
 
-        profiles.append(db.Player(steam_id=steam_id, steam_name=name, avatar_url=avatar_url, profile_url=profile_url))
+        profiles.append(
+            db_models.Player(steam_id=steam_id, steam_name=name, avatar_url=avatar_url, profile_url=profile_url))
 
     return profiles

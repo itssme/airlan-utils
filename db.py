@@ -7,6 +7,8 @@ from typing import List, TypeVar, Generic, Dict, Optional
 
 import psycopg2
 
+from utils import db_models
+
 
 class DbObject(object):
     def tuple(self):
@@ -60,35 +62,6 @@ class DbObject(object):
         cursor.execute(stmt, values)
 
 
-class Player(DbObject):
-    def __init__(self, id: int = None, name: str = "", steam_id: str = "", steam_name: str = "", profile_url: str = "",
-                 avatar_url: str = "", last_updated: int = 0):
-        self.id: int = id
-        self.name: str = name
-        self.steam_id: str = steam_id
-        self.steam_name: str = steam_name
-        self.profile_url: str = profile_url
-        self.avatar_url: str = avatar_url
-        self.last_updated: int = last_updated
-
-
-class Team(DbObject):
-    def __init__(self, id: int = None, tag: str = "", name: str = "", elo: int = 0, competing: int = 0,
-                 paid_registration_fee: int = 0, registration_fee_rnd: str = "", verified: int = 0,
-                 account: str = "noacc", locked_changes: int = 0, sponsored: int = 0):
-        self.id: int = id
-        self.tag: str = tag
-        self.name: str = name
-        self.elo: int = elo
-        self.competing: int = competing
-        self.paid_registration_fee: int = paid_registration_fee
-        self.registration_fee_rnd: str = registration_fee_rnd
-        self.verified: int = verified
-        self.account: str = account
-        self.locked_changes: int = locked_changes
-        self.sponsored: int = sponsored
-
-
 class Server(DbObject):
     def __init__(self, id: int = None, ip: str = "host.docker.internal", port: int = None, gslt_token: str = "",
                  container_name: str = None, match: int = None):
@@ -131,7 +104,7 @@ class Account(DbObject):
         self.role: str = role
 
 
-T = TypeVar("T", Player, Team, Server, Match, Stats, Account)
+T = TypeVar("T", Server, Match, Stats, Account)
 
 
 class DbObjImpl(Generic[T]):
@@ -147,231 +120,18 @@ class DbObjImpl(Generic[T]):
         return self.__orig_class__.__args__[0](*tuple)
 
 
-@DeprecationWarning
-def setup_db():
-    if os.getenv("MASTER", "1") != "1":
-        logging.info("Not a master instance, wont create tables in db and ignore teams.json")
-        return
-
-    # TODO: fix this
-    logging.info("Creating tables..")
-    connected = False
-
-    while not connected:
-        with psycopg2.connect(
-                host=os.getenv("DB_HOST", "db"),
-                database="postgres",
-                user="postgres",
-                password=os.getenv("DB_PASSWORD", "pass")) as conn:
-            connected = True
-
-            with conn.cursor() as cursor:
-                try:
-                    cursor.execute(open("sql/db.sql", "r").read())
-                except Exception as e:
-                    # for some reason postgres has some trouble handling "create table if not exists"
-                    #   in combination with multiprocessing
-                    logging.warning("Could not create tables -> {}".format(str(e)))
-
-            logging.info("Creating tables done")
-
-        if not connected:
-            logging.warning("Could not connect to database, retrying in 5 sec...")
-            time.sleep(5)
-
-    logging.info("Parsing teams.json")
-    teams = None
-    with open("teams.json", "r") as teams:
-        teams = json.loads(teams.read())
-
-    if teams is None:
-        raise Exception("Unable to parse team.json")
-
-    for team in teams:
-        team_obj = DbObjImpl[Team]().from_json(team)
-        insert_team_or_set_id(team_obj)
-        for player in team["players"]:
-            player_obj = DbObjImpl[Player]().from_json(player)
-            try:
-                insert_player_or_set_id(player_obj)
-            except psycopg2.errors.UniqueViolation:
-                player_obj = get_player_by_steam_id(player_obj.steam_id)
-            insert_team_assignment_if_not_exists(team_obj, player_obj)
+def get_free_teams() -> List[db_models.Team]:
+    all_teams = db_models.Team().select().where(db_models.Team.competing < 1)
+    busy_teams = db_models.Team().select().join(db_models.Match, on=(
+            (db_models.Team.id == db_models.Match.team1) | (db_models.Team.id == db_models.Match.team2))).where(
+        db_models.Match.finished < 1)
+    return list(all_teams - busy_teams)
 
 
-def insert_player_or_set_id(player: Player):
-    with psycopg2.connect(
-            host=os.getenv("DB_HOST", "db"),
-            database="postgres",
-            user="postgres",
-            password=os.getenv("DB_PASSWORD", "pass")) as conn:
-        with conn.cursor() as cursor:
-            cursor.execute("select id from player where steam_id = %s", (player.steam_id,))
-            res = cursor.fetchall()
-            if len(res) != 0:
-                player.id = res[0][0]
-                logging.info(f"Found player: '{player.name}' in database -> '{player.steam_id}'")
-                return
-
-        with conn.cursor() as cursor:
-            player.insert_into_db_with_cursor(cursor)
-            logging.info(f"Inserted team: '{player}' into database")
-
-
-def insert_team_or_set_id(team: Team):
-    with psycopg2.connect(
-            host=os.getenv("DB_HOST", "db"),
-            database="postgres",
-            user="postgres",
-            password=os.getenv("DB_PASSWORD", "pass")) as conn:
-        with conn.cursor() as cursor:
-            cursor.execute("select id from team where name = %s", (team.name,))
-            res = cursor.fetchall()
-            if len(res) != 0:
-                team.id = res[0][0]
-                logging.info(f"Found team: '{team.name}' in database -> '{team.id}'")
-                return
-
-        with conn.cursor() as cursor:
-            team.insert_into_db_with_cursor(cursor)
-            logging.info(f"Inserted team: '{team}' into database")
-
-
-def insert_team_assignment_if_not_exists(team: Team, player: Player):
-    with psycopg2.connect(
-            host=os.getenv("DB_HOST", "db"),
-            database="postgres",
-            user="postgres",
-            password=os.getenv("DB_PASSWORD", "pass")) as conn:
-        with conn.cursor() as cursor:
-            cursor.execute("select * from team_assignment where team = %s and player = %s", (team.id, player.id))
-            res = cursor.fetchall()
-            if len(res) != 0:
-                return
-
-        with conn.cursor() as cursor:
-            cursor.execute("insert into team_assignment values(%s, %s)", (team.id, player.id))
-
-
-def delete_team_assignment(team: Team, player: Player):
-    with psycopg2.connect(
-            host=os.getenv("DB_HOST", "db"),
-            database="postgres",
-            user="postgres",
-            password=os.getenv("DB_PASSWORD", "pass")) as conn:
-        with conn.cursor() as cursor:
-            cursor.execute("delete from team_assignment where team = %s and player = %s", (team.id, player.id))
-
-
-def get_player(player_id: int) -> Player:
-    with psycopg2.connect(
-            host=os.getenv("DB_HOST", "db"),
-            database="postgres",
-            user="postgres",
-            password=os.getenv("DB_PASSWORD", "pass")) as conn:
-        with conn.cursor() as cursor:
-            cursor.execute("select * from player where id = %s", (player_id,))
-            player_tuple = cursor.fetchall()[0]
-            return DbObjImpl[Player]().from_tuple(player_tuple)
-
-
-def delete_player(player_id: int):
-    with psycopg2.connect(
-            host=os.getenv("DB_HOST", "db"),
-            database="postgres",
-            user="postgres",
-            password=os.getenv("DB_PASSWORD", "pass")) as conn:
-        with conn.cursor() as cursor:
-            cursor.execute("delete from player where id = %s", (player_id,))
-
-
-def delete_team(team_id: int):
-    with psycopg2.connect(
-            host=os.getenv("DB_HOST", "db"),
-            database="postgres",
-            user="postgres",
-            password=os.getenv("DB_PASSWORD", "pass")) as conn:
-        with conn.cursor() as cursor:
-            cursor.execute("delete from team where id = %s", (team_id,))
-
-
-def get_players() -> List[Player]:
-    with psycopg2.connect(
-            host=os.getenv("DB_HOST", "db"),
-            database="postgres",
-            user="postgres",
-            password=os.getenv("DB_PASSWORD", "pass")) as conn:
-        with conn.cursor() as cursor:
-            cursor.execute("select * from player")
-            player_tuple_list = cursor.fetchall()
-            return [DbObjImpl[Player]().from_tuple(player_tuple) for player_tuple in player_tuple_list]
-
-
-def get_player_by_steam_id(player_steam_id: str):
-    with psycopg2.connect(
-            host=os.getenv("DB_HOST", "db"),
-            database="postgres",
-            user="postgres",
-            password=os.getenv("DB_PASSWORD", "pass")) as conn:
-        with conn.cursor() as cursor:
-            cursor.execute("select * from player where steam_id = %s", (player_steam_id,))
-            player_tuple = cursor.fetchall()[0]
-            return DbObjImpl[Player]().from_tuple(player_tuple)
-
-
-def get_team_by_id(team_id: int) -> Optional[Team]:
-    with psycopg2.connect(
-            host=os.getenv("DB_HOST", "db"),
-            database="postgres",
-            user="postgres",
-            password=os.getenv("DB_PASSWORD", "pass")) as conn:
-        with conn.cursor() as cursor:
-            cursor.execute("select * from team where id = %s", (team_id,))
-
-            teams = cursor.fetchall()
-            if len(teams) == 0:
-                return None
-
-            return DbObjImpl[Team]().from_tuple(teams[0])
-
-
-def get_teams() -> List[Team]:
-    with psycopg2.connect(
-            host=os.getenv("DB_HOST", "db"),
-            database="postgres",
-            user="postgres",
-            password=os.getenv("DB_PASSWORD", "pass")) as conn:
-        with conn.cursor() as cursor:
-            cursor.execute("select * from team order by id")
-            team_tuple_list = cursor.fetchall()
-            return [DbObjImpl[Team]().from_tuple(team_tuple) for team_tuple in team_tuple_list]
-
-
-def get_free_teams() -> List[Team]:
-    with psycopg2.connect(
-            host=os.getenv("DB_HOST", "db"),
-            database="postgres",
-            user="postgres",
-            password=os.getenv("DB_PASSWORD", "pass")) as conn:
-        with conn.cursor() as cursor:
-            cursor.execute(
-                "select * from team where team.competing < 1 except select team.* from team join match on team.id = match.team1 or team.id = match.team2 where match.finished < 1;")
-            team_tuple_list = cursor.fetchall()
-            return [DbObjImpl[Team]().from_tuple(team_tuple) for team_tuple in team_tuple_list]
-
-
-def get_team_players(team_id: int) -> List[Player]:
-    with psycopg2.connect(
-            host=os.getenv("DB_HOST", "db"),
-            database="postgres",
-            user="postgres",
-            password=os.getenv("DB_PASSWORD", "pass")) as conn:
-        with conn.cursor() as cursor:
-            cursor.execute(
-                "select player.* from player join team_assignment on player.id = team_assignment.player where team_assignment.team = %s",
-                (team_id,))
-            players = cursor.fetchall()
-            return [DbObjImpl[Player]().from_tuple(player) for player in players]
+def get_team_players(team_id: int) -> List[db_models.Player]:
+    return list(db_models.Player().select().join(db_models.TeamAssignment,
+                                            on=(db_models.Player.id == db_models.TeamAssignment.player)).where(
+        db_models.TeamAssignment.team == team_id))
 
 
 def get_servers() -> List[Server]:
@@ -517,26 +277,6 @@ def get_least_used_host_ips():
             return host_list[0][0]
 
 
-def update_config():
-    if os.getenv("MASTER", "1") != "1":
-        logging.warning("Not a master instance, writing teams.json will have no effect.")
-
-    team_config = []
-    teams = get_teams()
-    for team in teams:
-        players = get_team_players(team.id)
-        team_config.append({
-            "name": team.name,
-            "tag": team.tag,
-            "players": [{"steam_id": player.steam_id, "name": player.name} for player in players],
-            "elo": team.elo,
-            "competing": team.competing
-        })
-
-    with open("teams.json", mode="w", encoding="utf-8") as outfile:
-        json.dump(team_config, outfile, indent=2, ensure_ascii=False)
-
-
 def insert_host(host_ip: str):
     with psycopg2.connect(
             host=os.getenv("DB_HOST", "db"),
@@ -547,68 +287,24 @@ def insert_host(host_ip: str):
             cursor.execute("insert into host (ip) values (%s)", (host_ip,))
 
 
-def delete_host(host_ip: str):
-    with psycopg2.connect(
-            host=os.getenv("DB_HOST", "db"),
-            database="postgres",
-            user="postgres",
-            password=os.getenv("DB_PASSWORD", "pass")) as conn:
-        with conn.cursor() as cursor:
-            cursor.execute("delete from host where ip = %s", (host_ip,))
+def create_account(username: str, password: str):
+    account = db_models.Account.create(username=username, password=password)
 
-
-def insert_account(username: str, password: str):
-    with psycopg2.connect(
-            host=os.getenv("DB_HOST", "db"),
-            database="postgres",
-            user="postgres",
-            password=os.getenv("DB_PASSWORD", "pass")) as conn:
-        with conn.cursor() as cursor:
-            cursor.execute("insert into account (\"username\", \"password\") values (%s, %s)", (username, password))
-
-        team = Team(None, "tag", f"{username}'s team",
-                    account=username,
-                    registration_fee_rnd="".join(
-                        [random.choice(
-                            [chr(random.randint(48, 57)), chr(random.randint(65, 90)), chr(random.randint(97, 122))]
-                        ) for _ in range(0, 10)]))
-        with conn.cursor() as cursor:
-            team.insert_into_db_with_cursor(cursor)
-
-
-def get_account(username: str):
-    with psycopg2.connect(
-            host=os.getenv("DB_HOST", "db"),
-            database="postgres",
-            user="postgres",
-            password=os.getenv("DB_PASSWORD", "pass")) as conn:
-        with conn.cursor() as cursor:
-            cursor.execute("select * from account where \"username\" = %s", (username,))
-            users = cursor.fetchall()
-            return DbObjImpl[Account]().from_tuple(users[0]) if len(users) == 1 else None
-
-
-def delete_account(username: str):
-    with psycopg2.connect(
-            host=os.getenv("DB_HOST", "db"),
-            database="postgres",
-            user="postgres",
-            password=os.getenv("DB_PASSWORD", "pass")) as conn:
-        with conn.cursor() as cursor:
-            cursor.execute("delete from account where \"username\" = %s", (username,))
+    db_models.Team.create(name=f"{username}'s team", tag="tag", account=account,
+                          registration_fee_rnd="".join(
+                              [random.choice(
+                                  [chr(random.randint(48, 57)), chr(random.randint(65, 90)),
+                                   chr(random.randint(97, 122))]
+                              ) for _ in range(0, 10)]))
 
 
 def get_team_id_by_account(username: str) -> Optional[int]:
-    with psycopg2.connect(
-            host=os.getenv("DB_HOST", "db"),
-            database="postgres",
-            user="postgres",
-            password=os.getenv("DB_PASSWORD", "pass")) as conn:
-        with conn.cursor() as cursor:
-            cursor.execute("select id from team where \"account\" = %s", (username,))
+    team = db_models.Team.get_or_none(db_models.Team.account == username)
 
-            team_ids = cursor.fetchall()
-            return team_ids[0][0] if len(team_ids) == 1 else None
+    if team is None:
+        return None
+    else:
+        return team.id
 
 
 def get_todos(username: str) -> List[Dict]:
@@ -617,7 +313,7 @@ def get_todos(username: str) -> List[Dict]:
     if team_id is None:
         return []
 
-    team = get_team_by_id(team_id)
+    team: db_models.Team = db_models.Team.get(db_models.Team.id == team_id)
     players = get_team_players(team_id)
 
     team_name_completed = team.name != f"{username}'s team" and team.tag != "tag"
