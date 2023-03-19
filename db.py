@@ -133,7 +133,7 @@ def get_team_players(team_id: int) -> List[db_models.Player]:
 
 
 def get_player_by_steam_id(steam_id: str) -> db_models.Player:
-    return db_models.Player().select().where(db_models.Player.steam_id == steam_id).get()
+    return db_models.Player().select().where(db_models.Player.steam_id == steam_id).first()
 
 
 def get_servers() -> List[Server]:
