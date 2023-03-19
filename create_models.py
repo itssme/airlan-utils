@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
 Script to create the pewee models from the database.
 
@@ -9,7 +9,7 @@ Output: db_models.py
 import os
 
 if __name__ == '__main__':
-    os.system("python -m pwiz -e postgresql -u postgres -p 5432 -H 127.0.0.1 -P postgres > db_models.py")
+    os.system("python3 -m pwiz -e postgresql -u postgres -p 5432 -H 127.0.0.1 -P postgres > db_models.py")
 
     lines = ["import os"]
     with open("db_models.py", "r") as f:

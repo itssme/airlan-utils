@@ -6,6 +6,7 @@ import time
 from typing import List, TypeVar, Generic, Dict, Optional
 
 import psycopg2
+from peewee import fn
 
 from utils import db_models
 
@@ -130,7 +131,7 @@ def get_free_teams() -> List[db_models.Team]:
 
 def get_team_players(team_id: int) -> List[db_models.Player]:
     return list(db_models.Player().select().join(db_models.TeamAssignment,
-                                            on=(db_models.Player.id == db_models.TeamAssignment.player)).where(
+                                                 on=(db_models.Player.id == db_models.TeamAssignment.player)).where(
         db_models.TeamAssignment.team == team_id))
 
 
@@ -307,6 +308,19 @@ def get_team_id_by_account(username: str) -> Optional[int]:
         return team.id
 
 
+def get_team_registration_fee(team_id: int) -> int:
+    base = 50  # TODO: make configurable?
+    orders = get_team_order_price(team_id)
+    return base + orders
+
+
+def get_team_order_price(team_id: int) -> int:
+    return int(sum([food_type.price for food_type in db_models.FoodType.select().join(db_models.Order, on=(
+            db_models.FoodType.id == db_models.Order.food)).join(db_models.TeamAssignment, on=(
+            db_models.Order.player == db_models.TeamAssignment.player)).where(
+        db_models.TeamAssignment.team == team_id)]))
+
+
 def get_todos(username: str) -> List[Dict]:
     team_id = get_team_id_by_account(username)
 
@@ -325,6 +339,8 @@ def get_todos(username: str) -> List[Dict]:
     registration_fee_completed = team.paid_registration_fee
     if team.sponsored:
         registration_fee_completed = True
+
+    verified_teams = db_models.Team.select().where(db_models.Team.verified == 1).count()
 
     return [
         {  # registration
@@ -357,7 +373,7 @@ def get_todos(username: str) -> List[Dict]:
         {  # verified
             "completed": team.verified == 1,
             "title": "Team Angenommen",
-            "desc": "Warte bis die Veranstalter deine Daten nochmals geprüft haben und dich zum Turnier freischalten."
+            "desc": f"Warte bis die Veranstalter deine Daten nochmals geprüft haben und dich zum Turnier freischalten. Plätze: {verified_teams}/10"
         }
     ]
 
