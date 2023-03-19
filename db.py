@@ -135,6 +135,10 @@ def get_team_players(team_id: int) -> List[db_models.Player]:
         db_models.TeamAssignment.team == team_id))
 
 
+def get_player_by_steam_id(steam_id: str) -> db_models.Player:
+    return db_models.Player().select().where(db_models.Player.steam_id == steam_id).get()
+
+
 def get_servers() -> List[Server]:
     with psycopg2.connect(
             host=os.getenv("DB_HOST", "db"),
