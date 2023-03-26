@@ -1,0 +1,12 @@
+start transaction;
+drop table if exists stats;
+drop table if exists server;
+drop table if exists host;
+drop table if exists match;
+drop table if exists team_assignment;
+drop table if exists "order";
+drop table if exists food_type;
+drop table if exists player;
+drop table if exists team;
+drop table if exists account;
+commit;
