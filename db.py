@@ -407,7 +407,7 @@ def get_rules():
                 "Das Tunier wird im ELO-System begonnen."
             ]
          },
-        {"id": 5, "rule": "Turnierausschluss begründende Umstände", "subrules":
+        {"id": 5, "rule": "Turnierausschluss", "subrules":
             [
                 "Alle Programme oder andere nicht technischen Hilfsmittel, welche einem Spieler, oder einem Team als ganzes, einen Vorteil gegenüber anderen Teams verschaffen, sind verboten. Ausgenommen sind Programme welche im allgemeinen Verständnis der CSGO Spieler nicht als Cheats angesehen werden, wie unter anderem Programme zur Kommunikation mit den anderen Spielern außerhalb des ingame-chats, wie Discord oder Teamspeak.",
                 "Modifikationen, die innerhalb des CSGO Clients stattfinden, wie unter anderem Jump-Throw-Binds, sind erlaubt.",
