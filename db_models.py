@@ -68,11 +68,13 @@ class Team(BaseModel):
 
     account = ForeignKeyField(column_name='account', field='username', model=Account)
 
-    competing = IntegerField(constraints=[SQL("DEFAULT 0")], null=True)
+    competing = IntegerField(constraints=[SQL("DEFAULT 2")], null=True)
 
     elo = IntegerField(constraints=[SQL("DEFAULT 1000")], null=True)
 
     locked_changes = IntegerField(constraints=[SQL("DEFAULT 0")], null=True)
+
+    locked_changes_time = IntegerField(null=True)
 
     name = TextField(unique=True)
 
