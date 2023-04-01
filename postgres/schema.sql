@@ -22,12 +22,13 @@ create table if not exists team
     tag                   text                    not null,
     name                  text unique             not null,
     elo                   int default 1000,
-    competing             int default 0,                    -- 0 = not competing, 1 = competing, 2 = completely ignored (even not visible in the leaderboard)
+    competing             int default 2,                    -- 0 = competing, 1 = not competing, 2 = completely ignored (even not visible in the leaderboard)
     paid_registration_fee int default 0,                    -- 0 = not paid, 1 = paid
     registration_fee_rnd  text                    not null, -- random text used for transaction
     verified              int default 0,                    -- 0 = not verified, 1 = verified
     account               text references account not null,
     locked_changes        int default 0,                    -- 0 = not locked, 1 = locked (user cannot change team name, tag, or players anymore)
+    locked_changes_time   int default null,                 -- unix timestamp of the time the team was locked
     sponsored             int default 0                     -- 0 = not sponsored, 1 = sponsored
 );
 
