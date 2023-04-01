@@ -335,7 +335,8 @@ def get_todos(username: str) -> List[Dict]:
     player_locked = not team_name_completed
 
     player_completed = len(players) == 5
-    registration_locked = not player_completed
+    verify_locked = not player_completed
+    registration_locked = team.verified != 1
 
     registration_fee_completed = team.paid_registration_fee
     if team.sponsored:
@@ -364,17 +365,20 @@ def get_todos(username: str) -> List[Dict]:
             "locked": player_locked,
             "display_only": team.locked_changes
         },
+        {  # verified
+            "substep": team.locked_changes == 1,
+            "completed": team.verified == 1,
+            "title": "Daten Bestätigt",
+            "route": "/public/team/confirm_data",
+            "desc": f"Bestätige deine Daten und Warte bis die Veranstalter sie nochmals geprüft haben und dich zum Turnier freischalten. Plätze: {verified_teams}/10",
+            "locked": verify_locked
+        },
         {  # paid registration fee
             "completed": registration_fee_completed,
             "title": "Teilnahmegebühr Zahlen",
             "desc": "Überweise die Teilnahmegebühr und warte auf die Bestätigung." if not team.sponsored else "Geponsortes team, keine Teilnahmegebühr fällig.",
             "route": "/public/team/fee",
             "locked": registration_locked
-        },
-        {  # verified
-            "completed": team.verified == 1,
-            "title": "Team Angenommen",
-            "desc": f"Warte bis die Veranstalter deine Daten nochmals geprüft haben und dich zum Turnier freischalten. Plätze: {verified_teams}/10"
         }
     ]
 
