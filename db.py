@@ -407,11 +407,25 @@ def get_rules():
             ]
          },
         {"id": 4, "rule": "Spielmodus", "subrules":
-            [  # TODO: add veto, roundtime etc.
-                "Das Tunier wird im ELO-System begonnen."
+            [
+                "Das Turnier wird im ELO-System begonnen.",
+                "Jedes Spiel wird in einem Best-of-One Modus gespielt.",
+                "Die Karten werden vor dem Spiel in einem Veto System von den Teamleitern ausgewählt.",
+                "Danach wird eine Knife Runde auf der Map gespielt. Der Gewinner der Knife Runde entscheidet, welche Seite er spielen möchte. (CT oder T)",
+                "Alle Maps werden im Bomb-Defuse Modus gespielt, bis auf Agency, welche im Hostage Modus gespielt wird.",
+                "Bei einem Unentschieden wird eine Overtime gespielt, bei der beide Teams im Spiel mit 10.000$ starten und sechs Runden spielen müssen.",
+                "Sollte es nach den sechsten Runden wieder ein Unentschieden geben, wird eine weitere Overtime gespielt, bei der wieder beide Teams im Spiel mit 10.000$ starten und 6 Runden spielen müssen."
             ]
          },
-        {"id": 5, "rule": "Turnierausschluss", "subrules":
+        {"id": 5, "rule": "Allgemeine Turnierregeln", "subrules":
+            [
+                "Die Regeln des Turniers werden auf dieser Plattform veröffentlicht und können jederzeit geändert werden.",
+                "Alle Spiele werden aufgenommen und die Demo Dateien anschliessend veröffentlicht.",
+                "Der Teamleiter hat all seine Spieler über die hier veröffentlichen Regeln zu Unterrichten. Unwissenheit über Regeln sind dem Team anzulasten.",
+                "Teams, welche sich unsportliche Verhalten, oder andere Spieler oder Teams, in einer verletzenden Art und Weise beleidigen, welche selbst für den in CSGO herrschenden rauen Umgangston unüblich ist, werden bis zu 250 ELO Punkte abgezogen, oder in besonders schwerwiegenden Fällen vom Turnier ausgeschlossen.",
+            ]
+         },
+        {"id": 6, "rule": "Turnierausschluss", "subrules":
             [
                 "Alle Programme oder andere nicht technischen Hilfsmittel, welche einem Spieler, oder einem Team als ganzes, einen Vorteil gegenüber anderen Teams verschaffen, sind verboten. Ausgenommen sind Programme welche im allgemeinen Verständnis der CSGO Spieler nicht als Cheats angesehen werden, wie unter anderem Programme zur Kommunikation mit den anderen Spielern außerhalb des ingame-chats, wie Discord oder Teamspeak.",
                 "Modifikationen, die innerhalb des CSGO Clients stattfinden, wie unter anderem Jump-Throw-Binds, sind erlaubt.",
@@ -420,13 +434,5 @@ def get_rules():
                 "Sollte ein Spieler wegen eines Verstoßes gegen die Regeln des §5 disqualifiziert werden, behalten wir es uns als Veranstalter vor, den betreffenden Spieler nach § 146 StGB wegen Betrugs anzuzeigen.",
             ]
          },
-        {"id": 6, "rule": "Allgemeine Turnierregeln", "subrules":
-            [
-                "Die Regeln des Turniers werden auf dieser Plattform veröffentlicht und können jederzeit geändert werden.",
-                "Alle Spiele werden aufgenommen und die Demo Dateien anschliessend veröffentlicht.",
-                "Der Teamleiter hat all seine Spieler über die hier veröffentlichen Regeln zu Unterrichten. Unwissenheit über Regeln sind dem Team anzulasten.",
-                "Teams, welche sich unsportliche Verhalten, oder andere Spieler oder Teams, in einer verletzenden Art und Weise beleidigen, welche selbst für den in CSGO herrschenden rauen Umgangston unüblich ist, werden bis zu 250 ELO Punkte abgezogen, oder in besonders schwerwiegenden Fällen vom Turnier ausgeschlossen.",
-            ]
-         }
     ]
     return rules
