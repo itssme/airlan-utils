@@ -52,6 +52,42 @@ class FoodType(BaseModel):
 
 
 
+class Player(BaseModel):
+
+    avatar_url = TextField()
+
+    last_updated = IntegerField(constraints=[SQL("DEFAULT 0")], null=True)
+
+    name = TextField()
+
+    profile_url = TextField()
+
+    steam_id = TextField(unique=True)
+
+    steam_name = TextField()
+
+
+
+    class Meta:
+
+        table_name = 'player'
+
+
+
+class FoodOrder(BaseModel):
+
+    food = ForeignKeyField(column_name='food', field='id', model=FoodType, null=True)
+
+    player = ForeignKeyField(column_name='player', field='id', model=Player, null=True)
+
+
+
+    class Meta:
+
+        table_name = 'food_order'
+
+
+
 class Host(BaseModel):
 
     ip = TextField(primary_key=True)
@@ -121,42 +157,6 @@ class Match(BaseModel):
     class Meta:
 
         table_name = 'match'
-
-
-
-class Player(BaseModel):
-
-    avatar_url = TextField()
-
-    last_updated = IntegerField(constraints=[SQL("DEFAULT 0")], null=True)
-
-    name = TextField()
-
-    profile_url = TextField()
-
-    steam_id = TextField(unique=True)
-
-    steam_name = TextField()
-
-
-
-    class Meta:
-
-        table_name = 'player'
-
-
-
-class Order(BaseModel):
-
-    food = ForeignKeyField(column_name='food', field='id', model=FoodType, null=True)
-
-    player = ForeignKeyField(column_name='player', field='id', model=Player, null=True)
-
-
-
-    class Meta:
-
-        table_name = 'order'
 
 
 

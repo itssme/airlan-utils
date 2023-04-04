@@ -316,9 +316,9 @@ def get_team_registration_fee(team_id: int) -> int:
 
 
 def get_team_order_price(team_id: int) -> int:
-    return int(sum([food_type.price for food_type in db_models.FoodType.select().join(db_models.Order, on=(
-            db_models.FoodType.id == db_models.Order.food)).join(db_models.TeamAssignment, on=(
-            db_models.Order.player == db_models.TeamAssignment.player)).where(
+    return int(sum([food_type.price for food_type in db_models.FoodType.select().join(db_models.FoodOrder, on=(
+            db_models.FoodType.id == db_models.FoodOrder.food)).join(db_models.TeamAssignment, on=(
+            db_models.FoodOrder.player == db_models.TeamAssignment.player)).where(
         db_models.TeamAssignment.team == team_id)]))
 
 
