@@ -431,7 +431,7 @@ def get_rules():
                 "Modifikationen, die innerhalb des CSGO Clients stattfinden, wie unter anderem Jump-Throw-Binds, sind erlaubt.",
                 "Das Angreifen des Servers oder der Clients anderer Spieler ist verboten, dazu zählen insbesondere, DDOS Attacken oder ähnliches.",
                 "Wenn ein Spieler des Teams gegen die Regeln des §5 verstößt, wird das gesamte Team disqualifiziert und der Spieler wird für alle zukünftigen Turniere gesperrt.",
-                "Sollte ein Spieler wegen eines Verstoßes gegen die Regeln des §5 disqualifiziert werden, behalten wir es uns als Veranstalter vor, den betreffenden Spieler nach § 146 StGB wegen Betrugs anzuzeigen.",
+                "Sollte ein Spieler wegen eines Verstoßes gegen die Regeln des §6 disqualifiziert werden, behalten wir es uns als Veranstalter vor, den betreffenden Spieler nach § 146 StGB wegen Betrugs anzuzeigen.",
             ]
          },
     ]
