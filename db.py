@@ -292,6 +292,8 @@ def insert_host(host_ip: str):
 def create_account(username: str, password: str):
     account = db_models.Account.create(username=username, password=password)
 
+    # TODO: send email for account verification here
+
     db_models.Team.create(name=f"{username}'s team", tag="tag", account=account,
                           registration_fee_rnd="".join(
                               [random.choice(

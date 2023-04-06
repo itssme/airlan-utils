@@ -38,14 +38,14 @@ class EmailNotification(MQMessage):
     def __init__(self, subject: str, message: str, team: db_models.Team):
         msg = f"""Sehr geehrtes Team "{team.name}",
         
-        {message}
+{message}
         
-        Mit freundlichen Grüßen,
-        das airLAN Team
+Mit freundlichen Grüßen,
+das airLAN Team
         """
 
         msg_struct: dict = {
-            "email": team.email,
+            "email": team.account.username,
             "subject": subject,
             "message": msg
         }
