@@ -295,7 +295,7 @@ def create_account(username: str, password: str):
                                      ) for _ in range(0, 10)]))
 
     EmailNotification(subject="Willkommen bei der airLAN",
-                      message=f"Willkommen bei der airLAN. Damit sich euer Team auf der Anmeldeplattform einloggen kann, muss noch die E-Mail bestätigt werden: https://airlan.comp-air.at/verify/{account.verification_code}",
+                      message=f"Willkommen bei der airLAN. Damit sich euer Team auf der Anmeldeplattform einloggen kann, muss noch die E-Mail bestätigt werden: {os.getenv('WEB_SERVER_URL', 'https://airlan.comp-air.at')}/auth/verify/{account.verification_code}",
                       team=team).send()
 
 
