@@ -20,6 +20,7 @@ class MQMessage:
         self.queue = Queues.ErrorMessages
 
     def send(self):
+        declare_queues()
         with RabbitMQConn() as connection:
             channel = connection.channel()
             channel.basic_publish(exchange='',
@@ -83,5 +84,4 @@ def declare_queues() -> dict:
         for queue in Queues:
             res[queue.value] = channel.queue_declare(queue=queue.value, durable=True)
 
-    logging.info("Done declaring queues")
     return res
