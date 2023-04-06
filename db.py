@@ -6,7 +6,7 @@ from typing import List, TypeVar, Generic, Dict, Optional
 import psycopg2
 
 from utils import db_models
-from utils.rabbitmq import EmailNotification
+from utils.rabbitmq import EmailNotification, AdminMessage
 
 
 class DbObject(object):
@@ -297,6 +297,7 @@ def create_account(username: str, password: str):
     EmailNotification(subject="Willkommen bei der airLAN",
                       message=f"Willkommen bei der airLAN. Damit sich euer Team auf der Anmeldeplattform einloggen kann, muss noch die E-Mail bestätigt werden: {os.getenv('WEB_SERVER_URL', 'https://airlan.comp-air.at')}/auth/verify/{account.verification_code}",
                       team=team).send()
+    AdminMessage(message=f"Neuer Account: {username}").send()
 
 
 def get_team_id_by_account(username: str) -> Optional[int]:

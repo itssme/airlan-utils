@@ -1,3 +1,5 @@
+import base64
+import datetime
 import json
 import logging
 import os
@@ -29,12 +31,6 @@ class MQMessage:
             logging.info(f"Sent message: {self.message} to {self.queue.value}")
 
 
-class AdminMessage(MQMessage):
-    def __init__(self, message: str):
-        super().__init__(message)
-        self.queue = Queues.AdminMessages
-
-
 class EmailNotification(MQMessage):
     def __init__(self, subject: str, message: str, team: db_models.Team):
         msg = f"""Sehr geehrtes Team "{team.name}",
@@ -55,9 +51,26 @@ das airLAN Team
         self.queue = Queues.EmailNotifications
 
 
-class ErrorMessage(MQMessage):
+class AdminMessage(MQMessage):
     def __init__(self, message: str):
-        super().__init__(message)
+        msg: dict = {
+            "message": message,
+            "timestamp": str(datetime.datetime.now())
+        }
+
+        super().__init__(json.dumps(msg))
+        self.queue = Queues.AdminMessages
+
+
+class ErrorMessage(MQMessage):
+    def __init__(self, message: str, json_data: dict):
+        msg: dict = {
+            "message": message,
+            "timestamp": str(datetime.datetime.now()),
+            "json": base64.b64encode(json.dumps(json_data, indent=4, ensure_ascii=False).encode()).decode()
+        }
+
+        super().__init__(json.dumps(msg))
         self.queue = Queues.ErrorMessages
 
 
