@@ -11,9 +11,11 @@ create table if not exists "player"
 
 create table if not exists "account"
 (
-    "username" text primary key,
-    "password" text not null, -- stored as hash
-    "role"     text not null default 'user'
+    "username"          text primary key,
+    "password"          text not null,          -- stored as hash
+    "role"              text not null default 'user',
+    "verification_code" text not null,          -- random text used for verification
+    "verified"          int           default 0 -- 0 = not verified, 1 = verified
 );
 
 create table if not exists "team"

@@ -6,6 +6,7 @@ from typing import List, TypeVar, Generic, Dict, Optional
 import psycopg2
 
 from utils import db_models
+from utils.rabbitmq import EmailNotification
 
 
 class DbObject(object):
@@ -95,14 +96,7 @@ class Stats(DbObject):
         self.type: int = type
 
 
-class Account(DbObject):
-    def __init__(self, username: str = None, password: str = None, role: str = "user"):
-        self.username: str = username
-        self.password: str = password
-        self.role: str = role
-
-
-T = TypeVar("T", Server, Match, Stats, Account)
+T = TypeVar("T", Server, Match, Stats)
 
 
 class DbObjImpl(Generic[T]):
@@ -290,16 +284,19 @@ def insert_host(host_ip: str):
 
 
 def create_account(username: str, password: str):
-    account = db_models.Account.create(username=username, password=password)
+    account = db_models.Account.create(username=username, password=password, verification_code="".join(
+        [random.choice([chr(random.randint(48, 57)), chr(random.randint(65, 90))]) for _ in range(0, 60)]))
 
-    # TODO: send email for account verification here
+    team = db_models.Team.create(name=f"{username}'s team", tag="tag", account=account,
+                                 registration_fee_rnd="".join(
+                                     [random.choice(
+                                         [chr(random.randint(48, 57)), chr(random.randint(65, 90)),
+                                          chr(random.randint(97, 122))]
+                                     ) for _ in range(0, 10)]))
 
-    db_models.Team.create(name=f"{username}'s team", tag="tag", account=account,
-                          registration_fee_rnd="".join(
-                              [random.choice(
-                                  [chr(random.randint(48, 57)), chr(random.randint(65, 90)),
-                                   chr(random.randint(97, 122))]
-                              ) for _ in range(0, 10)]))
+    EmailNotification(subject="Willkommen bei der airLAN",
+                      message=f"Willkommen bei der airLAN. Damit sich euer Team auf der Anmeldeplattform einloggen kann, muss noch die E-Mail bestätigt werden: https://airlan.comp-air.at/verify/{account.verification_code}",
+                      team=team).send()
 
 
 def get_team_id_by_account(username: str) -> Optional[int]:

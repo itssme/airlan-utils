@@ -28,6 +28,10 @@ class Account(BaseModel):
 
     username = TextField(primary_key=True)
 
+    verification_code = TextField()
+
+    verified = IntegerField(constraints=[SQL("DEFAULT 0")], null=True)
+
 
 
     class Meta:
