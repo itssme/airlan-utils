@@ -18,7 +18,7 @@ if __name__ == '__main__':
     for i in range(0, len(lines)):
         if "database = PostgresqlDatabase('p" in lines[i]:
             lines[
-                i] = "database = PostgresqlDatabase(os.getenv('POSTGRES_DB', 'postgres'), **{'host': 'db', 'port': 5432, 'user': os.getenv('POSTGRES_USER', 'postgres'), 'password': os.getenv('POSTGRES_PASSWORD', 'pass')})"
+                i] = "database = PostgresqlDatabase(os.getenv('POSTGRES_DB', 'postgres'), **{'host': os.getenv('POSTGRES_DB_HOST', 'db'), 'port': int(os.getenv('POSTGRES_DB_PORT', '5432')), 'user': os.getenv('POSTGRES_USER', 'postgres'), 'password': os.getenv('POSTGRES_PASSWORD', 'pass')})"
 
     with open("db_models.py", "w") as f:
         f.write("\n".join(lines))

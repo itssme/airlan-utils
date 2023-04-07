@@ -3,7 +3,7 @@ from peewee import *
 
 
 
-database = PostgresqlDatabase(os.getenv('POSTGRES_DB', 'postgres'), **{'host': 'db', 'port': 5432, 'user': os.getenv('POSTGRES_USER', 'postgres'), 'password': os.getenv('POSTGRES_PASSWORD', 'pass')})
+database = PostgresqlDatabase(os.getenv('POSTGRES_DB', 'postgres'), **{'host': os.getenv('POSTGRES_DB_HOST', 'db'), 'port': int(os.getenv('POSTGRES_DB_PORT', '5432')), 'user': os.getenv('POSTGRES_USER', 'postgres'), 'password': os.getenv('POSTGRES_PASSWORD', 'pass')})
 
 
 class UnknownField(object):
@@ -24,8 +24,6 @@ class Account(BaseModel):
 
     password = TextField()
 
-    password_reset_token = TextField(null=True)
-
     role = TextField(constraints=[SQL("DEFAULT 'user'::text")])
 
     username = TextField(primary_key=True)
@@ -39,20 +37,6 @@ class Account(BaseModel):
     class Meta:
 
         table_name = 'account'
-
-
-
-class Config(BaseModel):
-
-    key = TextField(primary_key=True)
-
-    value = TextField()
-
-
-
-    class Meta:
-
-        table_name = 'config'
 
 
 

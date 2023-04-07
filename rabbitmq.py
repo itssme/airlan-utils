@@ -12,9 +12,9 @@ from utils import db_models
 
 
 class Queues(Enum):
-    AdminMessages = "admin_messages"
-    ErrorMessages = "error_messages"
-    EmailNotifications = "email_notifications"
+    AdminMessages = os.getenv("RABBITMQ_Q_ADMIN_MESSAGES", "admin_messages")
+    ErrorMessages = os.getenv("RABBITMQ_Q_ERROR_MESSAGES", "error_messages")
+    EmailNotifications = os.getenv("RABBITMQ_Q_EMAIL_NOTIFICATIONS", "email_notifications")
 
 
 class MQMessage:
@@ -102,6 +102,7 @@ def declare_queues() -> dict:
     with RabbitMQConn() as connection:
         channel = connection.channel()
         for queue in Queues:
-            res[queue.value] = channel.queue_declare(queue=queue.value, durable=True)
+            res[queue.value] = channel.queue_declare(queue=queue.value, durable=True,
+                                                     arguments={"x-queue-type": "quorum"})
 
     return res
