@@ -4,6 +4,7 @@ import json
 import logging
 import os
 from enum import Enum
+from typing import Union
 
 import pika
 
@@ -53,6 +54,8 @@ das airLAN Team
 
 class AdminMessage(MQMessage):
     def __init__(self, message: str):
+        logging.info(f"Admin Message: {message}")
+
         msg: dict = {
             "message": message,
             "timestamp": str(datetime.datetime.now())
@@ -63,12 +66,16 @@ class AdminMessage(MQMessage):
 
 
 class ErrorMessage(MQMessage):
-    def __init__(self, message: str, json_data: dict):
+    def __init__(self, message: str, json_data: Union[None, dict] = None):
+        logging.error(f"Error: {message} - {json_data}")
+
         msg: dict = {
             "message": message,
-            "timestamp": str(datetime.datetime.now()),
-            "json": base64.b64encode(json.dumps(json_data, indent=4, ensure_ascii=False).encode()).decode()
+            "timestamp": str(datetime.datetime.now())
         }
+
+        if json_data is not None:
+            msg["json"] = base64.b64encode(json.dumps(json_data, indent=4, ensure_ascii=False).encode()).decode()
 
         super().__init__(json.dumps(msg))
         self.queue = Queues.ErrorMessages
