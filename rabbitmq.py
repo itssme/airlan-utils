@@ -33,7 +33,10 @@ class MQMessage:
 
 
 class EmailNotification(MQMessage):
-    def __init__(self, subject: str, message: str, team: db_models.Team):
+    def __init__(self, subject: str, message: str, team: Union[None, db_models.Team] = None,
+                 email: Union[None, str] = None):
+        email = email if email is not None else team.account.username
+
         msg = f"""Sehr geehrtes Team "{team.name}",
         
 {message}
@@ -43,7 +46,7 @@ das airLAN Team
         """
 
         msg_struct: dict = {
-            "email": team.account.username,
+            "email": email,
             "subject": subject,
             "message": msg
         }
