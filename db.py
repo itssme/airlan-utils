@@ -310,7 +310,7 @@ def get_team_id_by_account(username: str) -> Optional[int]:
 
 
 def get_team_registration_fee(team_id: int) -> int:
-    base = 50  # TODO: make configurable?
+    base = int(db_models.Config.get(db_models.Config.key == "registration_fee_base_fee").value)
     orders = get_team_order_price(team_id)
     return base + orders
 

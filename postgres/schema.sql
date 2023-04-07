@@ -11,11 +11,12 @@ create table if not exists "player"
 
 create table if not exists "account"
 (
-    "username"          text primary key,
-    "password"          text not null,          -- stored as hash
-    "role"              text not null default 'user',
-    "verification_code" text not null,          -- random text used for verification
-    "verified"          int           default 0 -- 0 = not verified, 1 = verified
+    "username"             text primary key,
+    "password"             text not null,             -- stored as hash
+    "role"                 text not null default 'user',
+    "verification_code"    text not null,             -- random text used for verification
+    "verified"             int           default 0,   -- 0 = not verified, 1 = verified
+    "password_reset_token" text          default null -- random text used for password reset
 );
 
 create table if not exists "team"
@@ -109,3 +110,23 @@ create table if not exists "food_order"
     player integer references "player" on delete cascade,
     food   integer references "food_type" on delete cascade
 );
+
+create table if not exists "config"
+(
+    "key"   text primary key,
+    "value" text not null
+);
+
+insert into "config" ("key", "value")
+values ('registration_fee_enabled', '0')
+on conflict do nothing;
+insert into "config" ("key", "value")
+values ('registration_fee_base_fee', '50')
+on conflict do nothing;
+insert into "config" ("key", "value")
+values ('registration_fee_account', '')
+on conflict do nothing;
+insert into "config" ("key", "value")
+values ('account_registration_enabled', '1')
+on conflict do nothing;
+
