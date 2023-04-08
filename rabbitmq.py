@@ -23,6 +23,10 @@ class MQMessage:
         self.queue = Queues.ErrorMessages
 
     def send(self):
+        if self.message == "":
+            logging.error("Tried to send empty message")
+            return
+
         declare_queues()
         with RabbitMQConn() as connection:
             channel = connection.channel()
@@ -33,10 +37,11 @@ class MQMessage:
 
 
 class EmailNotification(MQMessage):
-    def __init__(self, subject: str, message: str, team: Union[None, db_models.Team] = None,
-                 email: Union[None, str] = None):
-        email = email if email is not None else team.account.username
+    def __init__(self):
+        super().__init__("")
+        self.queue = Queues.EmailNotifications
 
+    def team_message(self, subject: str, message: str, team: db_models.Team):
         msg = f"""Sehr geehrtes Team "{team.name}",
         
 {message}
@@ -46,13 +51,25 @@ das airLAN Team
         """
 
         msg_struct: dict = {
-            "email": email,
+            "email": team.email,
             "subject": subject,
             "message": msg
         }
 
         super().__init__(json.dumps(msg_struct))
         self.queue = Queues.EmailNotifications
+        return self
+
+    def manual_message(self, subject: str, message: str, email: str):
+        msg_struct: dict = {
+            "email": email,
+            "subject": subject,
+            "message": message
+        }
+
+        super().__init__(json.dumps(msg_struct))
+        self.queue = Queues.EmailNotifications
+        return self
 
 
 class AdminMessage(MQMessage):
