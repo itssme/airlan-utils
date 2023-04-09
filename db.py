@@ -295,8 +295,10 @@ def create_account(username: str, password: str):
                                      ) for _ in range(0, 10)]))
 
     EmailNotification().team_message(subject="Willkommen bei der airLAN",
-                      message=f"Willkommen bei der airLAN. Damit sich euer Team auf der Anmeldeplattform einloggen kann, muss noch die E-Mail bestätigt werden: {os.getenv('WEB_SERVER_URL', 'https://airlan.comp-air.at')}/auth/verify/{account.verification_code}",
-                      team=team).send()
+                                     message=f"Willkommen bei der airLAN. Damit sich euer Team auf der Anmeldeplattform einloggen kann, muss noch die E-Mail bestätigt werden: {os.getenv('WEB_SERVER_URL', 'https://airlan.comp-air.at')}/auth/verify/{account.verification_code}"
+                                             f""
+                                             f"Außerdem könnt ihr gerne auf den airLAN Discord kommen: https://discord.gg/r5WpnZa5UB",
+                                     team=team).send()
     AdminMessage(message=f"Neuer Account: {username}").send()
 
 
@@ -343,6 +345,7 @@ def get_todos(username: str) -> List[Dict]:
         registration_fee_completed = True
 
     verified_teams = db_models.Team.select().where(db_models.Team.verified == 1).count()
+    max_teams = int(db_models.Config.get(db_models.Config.key == "max_teams").value)
 
     return [
         {  # registration
@@ -355,7 +358,7 @@ def get_todos(username: str) -> List[Dict]:
             "title": "Team Namen Angeben",
             "desc": "Gib den Namen und den Tag deinen Teams an.",
             "route": "/public/team/registration",
-            "display_only": team.locked_changes
+            "display_only": team.locked_changes == 1
         },
         {  # player
             "completed": player_completed,
@@ -363,15 +366,16 @@ def get_todos(username: str) -> List[Dict]:
             "desc": "Füge alle fünf Spieler zu deinem Team hinzu.",
             "route": "/public/team/add_members",
             "locked": player_locked,
-            "display_only": team.locked_changes
+            "display_only": team.locked_changes == 1
         },
         {  # verified
             "substep": team.locked_changes == 1,
             "completed": team.verified == 1,
             "title": "Daten Bestätigt",
             "route": "/public/team/confirm_data",
-            "desc": f"Bestätige deine Daten und Warte bis die Veranstalter sie nochmals geprüft haben und dich zum Turnier freischalten. Plätze: {verified_teams}/10",
-            "locked": verify_locked
+            "desc": f"Bestätige deine Daten und Warte bis die Veranstalter sie nochmals geprüft haben und dich zum Turnier freischalten. Plätze: {verified_teams}/{max_teams}",
+            "locked": verify_locked,
+            "display_only": team.locked_changes == 1
         },
         {  # paid registration fee
             "completed": registration_fee_completed,

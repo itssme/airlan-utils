@@ -51,7 +51,7 @@ das airLAN Team
         """
 
         msg_struct: dict = {
-            "email": team.email,
+            "email": team.account.username,
             "subject": subject,
             "message": msg
         }

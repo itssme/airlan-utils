@@ -129,4 +129,5 @@ on conflict do nothing;
 insert into "config" ("key", "value")
 values ('account_registration_enabled', '1')
 on conflict do nothing;
-
+insert into "config" ("key", "value")
+values ('max_teams', '10')
