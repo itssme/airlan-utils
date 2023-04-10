@@ -111,28 +111,6 @@ create table if not exists "food_order"
     food   integer references "food_type" on delete cascade
 );
 
-create table if not exists "config"
-(
-    "key"   text primary key,
-    "value" text not null
-);
-
-insert into "config" ("key", "value")
-values ('registration_fee_enabled', '0')
-on conflict do nothing;
-insert into "config" ("key", "value")
-values ('registration_fee_base_fee', '50')
-on conflict do nothing;
-insert into "config" ("key", "value")
-values ('registration_fee_account', '')
-on conflict do nothing;
-insert into "config" ("key", "value")
-values ('account_registration_enabled', '1')
-on conflict do nothing;
-insert into "config" ("key", "value")
-values ('max_teams', '10')
-on conflict do nothing;
-
 create table if not exists "article_type"
 (
     "id"                 serial primary key,
@@ -155,4 +133,26 @@ create table if not exists "article_order"
 
 insert into "article_type" (name, description, image, available_quantity, max_order_quantity, price)
 values ('airLAN Energy', 'Offizieller Energy Drink der airLAN', '/static/images/airlan23/energy.webp', 80, 20, 1.5)
+on conflict do nothing;
+
+create table if not exists "config"
+(
+    "key"   text primary key,
+    "value" text not null
+);
+
+insert into "config" ("key", "value")
+values ('registration_fee_enabled', '0')
+on conflict do nothing;
+insert into "config" ("key", "value")
+values ('registration_fee_base_fee', '50')
+on conflict do nothing;
+insert into "config" ("key", "value")
+values ('registration_fee_account', '')
+on conflict do nothing;
+insert into "config" ("key", "value")
+values ('account_registration_enabled', '1')
+on conflict do nothing;
+insert into "config" ("key", "value")
+values ('max_teams', '10')
 on conflict do nothing;

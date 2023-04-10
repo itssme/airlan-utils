@@ -3,7 +3,7 @@ from peewee import *
 
 
 
-database = PostgresqlDatabase(os.getenv('POSTGRES_DB', 'postgres'), **{'host': 'db', 'port': 5432, 'user': os.getenv('POSTGRES_USER', 'postgres'), 'password': os.getenv('POSTGRES_PASSWORD', 'pass')})
+database = PostgresqlDatabase(os.getenv('POSTGRES_DB', 'postgres'), **{'host': os.getenv('POSTGRES_DB_HOST', 'db'), 'port': int(os.getenv('POSTGRES_DB_PORT', '5432')), 'user': os.getenv('POSTGRES_USER', 'postgres'), 'password': os.getenv('POSTGRES_PASSWORD', 'pass')})
 
 
 class UnknownField(object):
@@ -37,6 +37,82 @@ class Account(BaseModel):
     class Meta:
 
         table_name = 'account'
+
+
+
+class ArticleType(BaseModel):
+
+    available_quantity = IntegerField()
+
+    description = TextField()
+
+    image = TextField()
+
+    max_order_quantity = IntegerField()
+
+    name = TextField()
+
+    price = DoubleField()
+
+
+
+    class Meta:
+
+        table_name = 'article_type'
+
+
+
+class Team(BaseModel):
+
+    account = ForeignKeyField(column_name='account', field='username', model=Account)
+
+    competing = IntegerField(constraints=[SQL("DEFAULT 2")], null=True)
+
+    elo = IntegerField(constraints=[SQL("DEFAULT 1000")], null=True)
+
+    locked_changes = IntegerField(constraints=[SQL("DEFAULT 0")], null=True)
+
+    locked_changes_time = IntegerField(null=True)
+
+    name = TextField(unique=True)
+
+    paid_registration_fee = IntegerField(constraints=[SQL("DEFAULT 0")], null=True)
+
+    registration_fee_rnd = TextField()
+
+    sponsored = IntegerField(constraints=[SQL("DEFAULT 0")], null=True)
+
+    tag = TextField()
+
+    verified = IntegerField(constraints=[SQL("DEFAULT 0")], null=True)
+
+
+
+    class Meta:
+
+        table_name = 'team'
+
+
+
+class ArticleOrder(BaseModel):
+
+    article = ForeignKeyField(column_name='article', constraints=[SQL("DEFAULT nextval('article_order_article_seq'::regclass)")], field='id', model=ArticleType)
+
+    quantity = IntegerField()
+
+    team = ForeignKeyField(column_name='team', constraints=[SQL("DEFAULT nextval('article_order_team_seq'::regclass)")], field='id', model=Team)
+
+
+
+    class Meta:
+
+        table_name = 'article_order'
+
+        indexes = (
+
+            (('team', 'article'), True),
+
+        )
 
 
 
@@ -101,38 +177,6 @@ class Host(BaseModel):
     class Meta:
 
         table_name = 'host'
-
-
-
-class Team(BaseModel):
-
-    account = ForeignKeyField(column_name='account', field='username', model=Account)
-
-    competing = IntegerField(constraints=[SQL("DEFAULT 2")], null=True)
-
-    elo = IntegerField(constraints=[SQL("DEFAULT 1000")], null=True)
-
-    locked_changes = IntegerField(constraints=[SQL("DEFAULT 0")], null=True)
-
-    locked_changes_time = IntegerField(null=True)
-
-    name = TextField(unique=True)
-
-    paid_registration_fee = IntegerField(constraints=[SQL("DEFAULT 0")], null=True)
-
-    registration_fee_rnd = TextField()
-
-    sponsored = IntegerField(constraints=[SQL("DEFAULT 0")], null=True)
-
-    tag = TextField()
-
-    verified = IntegerField(constraints=[SQL("DEFAULT 0")], null=True)
-
-
-
-    class Meta:
-
-        table_name = 'team'
 
 
 

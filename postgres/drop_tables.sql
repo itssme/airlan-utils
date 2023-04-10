@@ -11,4 +11,5 @@ drop table if exists "article_type";
 drop table if exists "player";
 drop table if exists "team";
 drop table if exists "account";
+drop table if exists "config";
 commit;
