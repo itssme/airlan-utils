@@ -270,7 +270,9 @@ def create_account(username: str, password: str):
 
     try:
         EmailNotification().team_message(subject="Willkommen bei der airLAN",
-                                         message=f"Willkommen bei der airLAN. Damit sich euer Team auf der Anmeldeplattform einloggen kann, muss noch die E-Mail bestätigt werden: {os.getenv('WEB_SERVER_URL', 'https://airlan.comp-air.at')}/auth/verify/{account.verification_code}\n\nAußerdem könnt ihr gerne auf den airLAN Discord kommen: https://discord.gg/r5WpnZa5UB",
+                                         message=f"""Willkommen bei der airLAN. Damit sich euer Team auf der Anmeldeplattform einloggen kann, muss noch die E-Mail bestätigt werden: {os.getenv('WEB_SERVER_URL', 'https://airlan.comp-air.at')}/auth/verify/{account.verification_code}
+
+Außerdem könnt ihr gerne auf den airLAN Discord kommen: https://discord.gg/r5WpnZa5UB""",
                                          team=team).send()
         AdminMessage(message=f"Neuer Account: {username}").send()
     except Exception as e:
