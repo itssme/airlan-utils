@@ -6,6 +6,8 @@ drop table if exists "match";
 drop table if exists "team_assignment";
 drop table if exists "food_order";
 drop table if exists "food_type";
+drop table if exists "article_order";
+drop table if exists "article_type";
 drop table if exists "player";
 drop table if exists "team";
 drop table if exists "account";

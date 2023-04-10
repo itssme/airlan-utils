@@ -131,3 +131,28 @@ values ('account_registration_enabled', '1')
 on conflict do nothing;
 insert into "config" ("key", "value")
 values ('max_teams', '10')
+on conflict do nothing;
+
+create table if not exists "article_type"
+(
+    "id"                 serial primary key,
+    "name"               text    not null,
+    "description"        text    not null,
+    "image"              text    not null,
+    "available_quantity" integer not null,
+    "max_order_quantity" integer not null,
+    "price"              float   not null
+);
+
+create table if not exists "article_order"
+(
+    "id"       serial primary key,
+    "team"     serial  not null references "team",
+    "article"  serial  not null references "article_type",
+    "quantity" integer not null,
+    CONSTRAINT "article_order_team_article_key" UNIQUE ("team", "article")
+);
+
+insert into "article_type" (name, description, image, available_quantity, max_order_quantity, price)
+values ('airLAN Energy', 'Offizieller Energy Drink der airLAN', '/static/images/airlan23/energy.webp', 80, 20, 1.5)
+on conflict do nothing;

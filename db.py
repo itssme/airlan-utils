@@ -4,6 +4,7 @@ import random
 from typing import List, TypeVar, Generic, Dict, Optional
 
 import psycopg2
+from peewee import fn
 
 from utils import db_models
 from utils.rabbitmq import EmailNotification, AdminMessage
@@ -311,17 +312,30 @@ def get_team_id_by_account(username: str) -> Optional[int]:
         return team.id
 
 
-def get_team_registration_fee(team_id: int) -> int:
+def get_team_registration_fee(team_id: int) -> float:
     base = int(db_models.Config.get(db_models.Config.key == "registration_fee_base_fee").value)
-    orders = get_team_order_price(team_id)
-    return base + orders
+    food_orders = get_team_food_order_price(team_id)
+    article_orders = get_team_article_order_price(team_id)
+    return base + food_orders + article_orders
 
 
-def get_team_order_price(team_id: int) -> int:
+def get_team_food_order_price(team_id: int) -> float:
     return int(sum([food_type.price for food_type in db_models.FoodType.select().join(db_models.FoodOrder, on=(
             db_models.FoodType.id == db_models.FoodOrder.food)).join(db_models.TeamAssignment, on=(
             db_models.FoodOrder.player == db_models.TeamAssignment.player)).where(
         db_models.TeamAssignment.team == team_id)]))
+
+
+def get_team_article_order_price(team_id: int) -> float:
+    price_sum = (db_models.Team
+                 .select(db_models.Team.id, fn.SUM(db_models.ArticleType.price * db_models.ArticleOrder.quantity).alias("price_sum"))
+                 .join(db_models.ArticleOrder, on=(db_models.Team.id == db_models.ArticleOrder.team))
+                 .join(db_models.ArticleType, on=(db_models.ArticleOrder.article == db_models.ArticleType.id))
+                 .group_by(db_models.Team.id).where(db_models.Team.id == team_id)).get_or_none()
+
+    if price_sum is None:
+        return 0
+    return price_sum.price_sum
 
 
 def get_todos(username: str) -> List[Dict]:
