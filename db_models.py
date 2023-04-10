@@ -24,6 +24,8 @@ class Account(BaseModel):
 
     password = TextField()
 
+    password_reset_token = TextField(null=True)
+
     role = TextField(constraints=[SQL("DEFAULT 'user'::text")])
 
     username = TextField(primary_key=True)
@@ -113,6 +115,20 @@ class ArticleOrder(BaseModel):
             (('team', 'article'), True),
 
         )
+
+
+
+class Config(BaseModel):
+
+    key = TextField(primary_key=True)
+
+    value = TextField()
+
+
+
+    class Meta:
+
+        table_name = 'config'
 
 
 
