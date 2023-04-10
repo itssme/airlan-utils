@@ -26,7 +26,7 @@ class DbObject(object):
 
     def insert_into_db(self):
         with psycopg2.connect(
-                host=os.getenv("DB_HOST", "db"),
+                host=os.getenv("POSTGRES_DB_HOST", "db"),
                 port=int(os.getenv('POSTGRES_DB_PORT', '5432')),
                 database=os.getenv('POSTGRES_DB', 'postgres'),
                 user=os.getenv('POSTGRES_USER', 'postgres'),
@@ -50,10 +50,11 @@ class DbObject(object):
             raise NotImplemented("Cannot insert object that does not use 'id' as primary key")
 
         with psycopg2.connect(
-                host=os.getenv("DB_HOST", "db"),
-                database="postgres",
-                user="postgres",
-                password=os.getenv("DB_PASSWORD", "pass")) as conn:
+                host=os.getenv("POSTGRES_DB_HOST", "db"),
+                port=int(os.getenv('POSTGRES_DB_PORT', '5432')),
+                database=os.getenv('POSTGRES_DB', 'postgres'),
+                user=os.getenv('POSTGRES_USER', 'postgres'),
+                password=os.getenv("POSTGRES_PASSWORD", "pass")) as conn:
             with conn.cursor() as cursor:
                 self.update_attribute_with_cursor(cursor, attr)
 

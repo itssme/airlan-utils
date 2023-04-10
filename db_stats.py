@@ -10,7 +10,7 @@ from utils.stat_events import Events
 
 def count_event_type(event: Events) -> int:
     with psycopg2.connect(
-            host=os.getenv("DB_HOST", "db"),
+            host=os.getenv("POSTGRES_DB_HOST", "db"),
             port=int(os.getenv('POSTGRES_DB_PORT', '5432')),
             database=os.getenv('POSTGRES_DB', 'postgres'),
             user=os.getenv('POSTGRES_USER', 'postgres'),
@@ -22,7 +22,7 @@ def count_event_type(event: Events) -> int:
 
 def player_with_most(event: Events) -> List[Tuple[str, int]]:
     with psycopg2.connect(
-            host=os.getenv("DB_HOST", "db"),
+            host=os.getenv("POSTGRES_DB_HOST", "db"),
             port=int(os.getenv('POSTGRES_DB_PORT', '5432')),
             database=os.getenv('POSTGRES_DB', 'postgres'),
             user=os.getenv('POSTGRES_USER', 'postgres'),
