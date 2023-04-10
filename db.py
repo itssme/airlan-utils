@@ -27,9 +27,10 @@ class DbObject(object):
     def insert_into_db(self):
         with psycopg2.connect(
                 host=os.getenv("DB_HOST", "db"),
-                database="postgres",
-                user="postgres",
-                password=os.getenv("DB_PASSWORD", "pass")) as conn:
+                port=int(os.getenv('POSTGRES_DB_PORT', '5432')),
+                database=os.getenv('POSTGRES_DB', 'postgres'),
+                user=os.getenv('POSTGRES_USER', 'postgres'),
+                password=os.getenv("POSTGRES_PASSWORD", "pass")) as conn:
             with conn.cursor() as cursor:
                 self.insert_into_db_with_cursor(cursor)
 
@@ -135,31 +136,23 @@ def get_player_by_steam_id(steam_id: str) -> db_models.Player:
 def get_servers() -> List[Server]:
     with psycopg2.connect(
             host=os.getenv("DB_HOST", "db"),
-            database="postgres",
-            user="postgres",
-            password=os.getenv("DB_PASSWORD", "pass")) as conn:
+            port=int(os.getenv('POSTGRES_DB_PORT', '5432')),
+            database=os.getenv('POSTGRES_DB', 'postgres'),
+            user=os.getenv('POSTGRES_USER', 'postgres'),
+            password=os.getenv("POSTGRES_PASSWORD", "pass")) as conn:
         with conn.cursor() as cursor:
             cursor.execute("select * from server")
             servers = cursor.fetchall()
             return [DbObjImpl[Server]().from_tuple(server) for server in servers]
 
 
-def insert_server(server: Server):
-    with psycopg2.connect(
-            host=os.getenv("DB_HOST", "db"),
-            database="postgres",
-            user="postgres",
-            password=os.getenv("DB_PASSWORD", "pass")) as conn:
-        with conn.cursor() as cursor:
-            server.insert_into_db_with_cursor(cursor)
-
-
 def get_server_by_id(server_id: int) -> Server:
     with psycopg2.connect(
             host=os.getenv("DB_HOST", "db"),
-            database="postgres",
-            user="postgres",
-            password=os.getenv("DB_PASSWORD", "pass")) as conn:
+            port=int(os.getenv('POSTGRES_DB_PORT', '5432')),
+            database=os.getenv('POSTGRES_DB', 'postgres'),
+            user=os.getenv('POSTGRES_USER', 'postgres'),
+            password=os.getenv("POSTGRES_PASSWORD", "pass")) as conn:
         with conn.cursor() as cursor:
             cursor.execute("select * from server where id = %s", (server_id,))
             return DbObjImpl[Server]().from_tuple(cursor.fetchall()[0])
@@ -168,9 +161,10 @@ def get_server_by_id(server_id: int) -> Server:
 def delete_server(server_id: int):
     with psycopg2.connect(
             host=os.getenv("DB_HOST", "db"),
-            database="postgres",
-            user="postgres",
-            password=os.getenv("DB_PASSWORD", "pass")) as conn:
+            port=int(os.getenv('POSTGRES_DB_PORT', '5432')),
+            database=os.getenv('POSTGRES_DB', 'postgres'),
+            user=os.getenv('POSTGRES_USER', 'postgres'),
+            password=os.getenv("POSTGRES_PASSWORD", "pass")) as conn:
         with conn.cursor() as cursor:
             cursor.execute("delete from server where id = %s", (server_id,))
 
@@ -178,9 +172,10 @@ def delete_server(server_id: int):
 def get_matches() -> List[Match]:
     with psycopg2.connect(
             host=os.getenv("DB_HOST", "db"),
-            database="postgres",
-            user="postgres",
-            password=os.getenv("DB_PASSWORD", "pass")) as conn:
+            port=int(os.getenv('POSTGRES_DB_PORT', '5432')),
+            database=os.getenv('POSTGRES_DB', 'postgres'),
+            user=os.getenv('POSTGRES_USER', 'postgres'),
+            password=os.getenv("POSTGRES_PASSWORD", "pass")) as conn:
         with conn.cursor() as cursor:
             cursor.execute("select * from match")
             matches = cursor.fetchall()
@@ -190,9 +185,10 @@ def get_matches() -> List[Match]:
 def get_match_by_id(match_id: int) -> Match:
     with psycopg2.connect(
             host=os.getenv("DB_HOST", "db"),
-            database="postgres",
-            user="postgres",
-            password=os.getenv("DB_PASSWORD", "pass")) as conn:
+            port=int(os.getenv('POSTGRES_DB_PORT', '5432')),
+            database=os.getenv('POSTGRES_DB', 'postgres'),
+            user=os.getenv('POSTGRES_USER', 'postgres'),
+            password=os.getenv("POSTGRES_PASSWORD", "pass")) as conn:
         with conn.cursor() as cursor:
             cursor.execute("select * from match where id = %s", (match_id,))
             return DbObjImpl[Match]().from_tuple(cursor.fetchall()[0])
@@ -201,9 +197,10 @@ def get_match_by_id(match_id: int) -> Match:
 def get_match_by_matchid(matchid: str) -> Match:
     with psycopg2.connect(
             host=os.getenv("DB_HOST", "db"),
-            database="postgres",
-            user="postgres",
-            password=os.getenv("DB_PASSWORD", "pass")) as conn:
+            port=int(os.getenv('POSTGRES_DB_PORT', '5432')),
+            database=os.getenv('POSTGRES_DB', 'postgres'),
+            user=os.getenv('POSTGRES_USER', 'postgres'),
+            password=os.getenv("POSTGRES_PASSWORD", "pass")) as conn:
         with conn.cursor() as cursor:
             cursor.execute("select * from match where matchid = %s", (matchid,))
             return DbObjImpl[Match]().from_tuple(cursor.fetchall()[0])
@@ -212,9 +209,10 @@ def get_match_by_matchid(matchid: str) -> Match:
 def get_match_by_serverid(server_id: int) -> Match:
     with psycopg2.connect(
             host=os.getenv("DB_HOST", "db"),
-            database="postgres",
-            user="postgres",
-            password=os.getenv("DB_PASSWORD", "pass")) as conn:
+            port=int(os.getenv('POSTGRES_DB_PORT', '5432')),
+            database=os.getenv('POSTGRES_DB', 'postgres'),
+            user=os.getenv('POSTGRES_USER', 'postgres'),
+            password=os.getenv("POSTGRES_PASSWORD", "pass")) as conn:
         with conn.cursor() as cursor:
             cursor.execute("select match.* from match join server on server.match = match.id where server.id = %s",
                            (server_id,))
@@ -224,9 +222,10 @@ def get_match_by_serverid(server_id: int) -> Match:
 def insert_match(match: Match):
     with psycopg2.connect(
             host=os.getenv("DB_HOST", "db"),
-            database="postgres",
-            user="postgres",
-            password=os.getenv("DB_PASSWORD", "pass")) as conn:
+            port=int(os.getenv('POSTGRES_DB_PORT', '5432')),
+            database=os.getenv('POSTGRES_DB', 'postgres'),
+            user=os.getenv('POSTGRES_USER', 'postgres'),
+            password=os.getenv("POSTGRES_PASSWORD", "pass")) as conn:
         with conn.cursor() as cursor:
             match.insert_into_db_with_cursor(cursor)
 
@@ -234,9 +233,10 @@ def insert_match(match: Match):
 def get_server_for_match(matchid: str) -> Server:
     with psycopg2.connect(
             host=os.getenv("DB_HOST", "db"),
-            database="postgres",
-            user="postgres",
-            password=os.getenv("DB_PASSWORD", "pass")) as conn:
+            port=int(os.getenv('POSTGRES_DB_PORT', '5432')),
+            database=os.getenv('POSTGRES_DB', 'postgres'),
+            user=os.getenv('POSTGRES_USER', 'postgres'),
+            password=os.getenv("POSTGRES_PASSWORD", "pass")) as conn:
         with conn.cursor() as cursor:
             cursor.execute("select server.* from server join match on server.match = match.id where match.matchid = %s",
                            (matchid,))
@@ -246,43 +246,14 @@ def get_server_for_match(matchid: str) -> Server:
 def get_hosts() -> List[str]:
     with psycopg2.connect(
             host=os.getenv("DB_HOST", "db"),
-            database="postgres",
-            user="postgres",
-            password=os.getenv("DB_PASSWORD", "pass")) as conn:
+            port=int(os.getenv('POSTGRES_DB_PORT', '5432')),
+            database=os.getenv('POSTGRES_DB', 'postgres'),
+            user=os.getenv('POSTGRES_USER', 'postgres'),
+            password=os.getenv("POSTGRES_PASSWORD", "pass")) as conn:
         with conn.cursor() as cursor:
             cursor.execute("select * from host")
             server_tuple_list = cursor.fetchall()
             return [host[0] for host in server_tuple_list]
-
-
-def get_least_used_host_ips():
-    with psycopg2.connect(
-            host=os.getenv("DB_HOST", "db"),
-            database="postgres",
-            user="postgres",
-            password=os.getenv("DB_PASSWORD", "pass")) as conn:
-        with conn.cursor() as cursor:
-            cursor.execute(
-                "select host.* from host left join server on host.ip = server.ip group by host.ip order by count(server.ip) asc")
-            host_list = cursor.fetchall()
-            if len(host_list) == 0:
-                logging.info(
-                    f"get_least_used_host_ips: no hosts found -> inserting external ip or default value: {os.getenv('EXTERNAL_IP', 'host.docker.internal')}")
-                insert_host(os.getenv("EXTERNAL_IP", "host.docker.internal"))
-                return get_least_used_host_ips()
-
-            logging.info(f"get_least_used_host_ips: {host_list}")
-            return host_list[0][0]
-
-
-def insert_host(host_ip: str):
-    with psycopg2.connect(
-            host=os.getenv("DB_HOST", "db"),
-            database="postgres",
-            user="postgres",
-            password=os.getenv("DB_PASSWORD", "pass")) as conn:
-        with conn.cursor() as cursor:
-            cursor.execute("insert into host (ip) values (%s)", (host_ip,))
 
 
 def create_account(username: str, password: str):
