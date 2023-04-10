@@ -135,7 +135,7 @@ def get_player_by_steam_id(steam_id: str) -> db_models.Player:
 
 def get_servers() -> List[Server]:
     with psycopg2.connect(
-            host=os.getenv("DB_HOST", "db"),
+            host=os.getenv("POSTGRES_DB_HOST", "db"),
             port=int(os.getenv('POSTGRES_DB_PORT', '5432')),
             database=os.getenv('POSTGRES_DB', 'postgres'),
             user=os.getenv('POSTGRES_USER', 'postgres'),
@@ -148,7 +148,7 @@ def get_servers() -> List[Server]:
 
 def get_server_by_id(server_id: int) -> Server:
     with psycopg2.connect(
-            host=os.getenv("DB_HOST", "db"),
+            host=os.getenv("POSTGRES_DB_HOST", "db"),
             port=int(os.getenv('POSTGRES_DB_PORT', '5432')),
             database=os.getenv('POSTGRES_DB', 'postgres'),
             user=os.getenv('POSTGRES_USER', 'postgres'),
@@ -160,7 +160,7 @@ def get_server_by_id(server_id: int) -> Server:
 
 def delete_server(server_id: int):
     with psycopg2.connect(
-            host=os.getenv("DB_HOST", "db"),
+            host=os.getenv("POSTGRES_DB_HOST", "db"),
             port=int(os.getenv('POSTGRES_DB_PORT', '5432')),
             database=os.getenv('POSTGRES_DB', 'postgres'),
             user=os.getenv('POSTGRES_USER', 'postgres'),
@@ -171,7 +171,7 @@ def delete_server(server_id: int):
 
 def get_matches() -> List[Match]:
     with psycopg2.connect(
-            host=os.getenv("DB_HOST", "db"),
+            host=os.getenv("POSTGRES_DB_HOST", "db"),
             port=int(os.getenv('POSTGRES_DB_PORT', '5432')),
             database=os.getenv('POSTGRES_DB', 'postgres'),
             user=os.getenv('POSTGRES_USER', 'postgres'),
@@ -184,7 +184,7 @@ def get_matches() -> List[Match]:
 
 def get_match_by_id(match_id: int) -> Match:
     with psycopg2.connect(
-            host=os.getenv("DB_HOST", "db"),
+            host=os.getenv("POSTGRES_DB_HOST", "db"),
             port=int(os.getenv('POSTGRES_DB_PORT', '5432')),
             database=os.getenv('POSTGRES_DB', 'postgres'),
             user=os.getenv('POSTGRES_USER', 'postgres'),
@@ -196,7 +196,7 @@ def get_match_by_id(match_id: int) -> Match:
 
 def get_match_by_matchid(matchid: str) -> Match:
     with psycopg2.connect(
-            host=os.getenv("DB_HOST", "db"),
+            host=os.getenv("POSTGRES_DB_HOST", "db"),
             port=int(os.getenv('POSTGRES_DB_PORT', '5432')),
             database=os.getenv('POSTGRES_DB', 'postgres'),
             user=os.getenv('POSTGRES_USER', 'postgres'),
@@ -208,7 +208,7 @@ def get_match_by_matchid(matchid: str) -> Match:
 
 def get_match_by_serverid(server_id: int) -> Match:
     with psycopg2.connect(
-            host=os.getenv("DB_HOST", "db"),
+            host=os.getenv("POSTGRES_DB_HOST", "db"),
             port=int(os.getenv('POSTGRES_DB_PORT', '5432')),
             database=os.getenv('POSTGRES_DB', 'postgres'),
             user=os.getenv('POSTGRES_USER', 'postgres'),
@@ -221,7 +221,7 @@ def get_match_by_serverid(server_id: int) -> Match:
 
 def insert_match(match: Match):
     with psycopg2.connect(
-            host=os.getenv("DB_HOST", "db"),
+            host=os.getenv("POSTGRES_DB_HOST", "db"),
             port=int(os.getenv('POSTGRES_DB_PORT', '5432')),
             database=os.getenv('POSTGRES_DB', 'postgres'),
             user=os.getenv('POSTGRES_USER', 'postgres'),
@@ -232,7 +232,7 @@ def insert_match(match: Match):
 
 def get_server_for_match(matchid: str) -> Server:
     with psycopg2.connect(
-            host=os.getenv("DB_HOST", "db"),
+            host=os.getenv("POSTGRES_DB_HOST", "db"),
             port=int(os.getenv('POSTGRES_DB_PORT', '5432')),
             database=os.getenv('POSTGRES_DB', 'postgres'),
             user=os.getenv('POSTGRES_USER', 'postgres'),
@@ -245,7 +245,7 @@ def get_server_for_match(matchid: str) -> Server:
 
 def get_hosts() -> List[str]:
     with psycopg2.connect(
-            host=os.getenv("DB_HOST", "db"),
+            host=os.getenv("POSTGRES_DB_HOST", "db"),
             port=int(os.getenv('POSTGRES_DB_PORT', '5432')),
             database=os.getenv('POSTGRES_DB', 'postgres'),
             user=os.getenv('POSTGRES_USER', 'postgres'),
