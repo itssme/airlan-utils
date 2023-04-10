@@ -4,6 +4,7 @@ import random
 from typing import List, TypeVar, Generic, Dict, Optional
 
 import psycopg2
+from fastapi import HTTPException
 from peewee import fn
 
 from utils import db_models
@@ -295,12 +296,18 @@ def create_account(username: str, password: str):
                                           chr(random.randint(97, 122))]
                                      ) for _ in range(0, 10)]))
 
-    EmailNotification().team_message(subject="Willkommen bei der airLAN",
-                                     message=f"Willkommen bei der airLAN. Damit sich euer Team auf der Anmeldeplattform einloggen kann, muss noch die E-Mail bestätigt werden: {os.getenv('WEB_SERVER_URL', 'https://airlan.comp-air.at')}/auth/verify/{account.verification_code}"
-                                             f""
-                                             f"Außerdem könnt ihr gerne auf den airLAN Discord kommen: https://discord.gg/r5WpnZa5UB",
-                                     team=team).send()
-    AdminMessage(message=f"Neuer Account: {username}").send()
+    try:
+        EmailNotification().team_message(subject="Willkommen bei der airLAN",
+                                         message=f"Willkommen bei der airLAN. Damit sich euer Team auf der Anmeldeplattform einloggen kann, muss noch die E-Mail bestätigt werden: {os.getenv('WEB_SERVER_URL', 'https://airlan.comp-air.at')}/auth/verify/{account.verification_code}"
+                                                 f""
+                                                 f"Außerdem könnt ihr gerne auf den airLAN Discord kommen: https://discord.gg/r5WpnZa5UB",
+                                         team=team).send()
+        AdminMessage(message=f"Neuer Account: {username}").send()
+    except Exception as e:
+        logging.error(f"Error sending email or admin message in account creation: {e}")
+        team.delete()
+        account.delete()
+        raise HTTPException(status_code=500, detail="Account konnte nicht erstellt werden")
 
 
 def get_team_id_by_account(username: str) -> Optional[int]:
@@ -328,7 +335,8 @@ def get_team_food_order_price(team_id: int) -> float:
 
 def get_team_article_order_price(team_id: int) -> float:
     price_sum = (db_models.Team
-                 .select(db_models.Team.id, fn.SUM(db_models.ArticleType.price * db_models.ArticleOrder.quantity).alias("price_sum"))
+                 .select(db_models.Team.id,
+                         fn.SUM(db_models.ArticleType.price * db_models.ArticleOrder.quantity).alias("price_sum"))
                  .join(db_models.ArticleOrder, on=(db_models.Team.id == db_models.ArticleOrder.team))
                  .join(db_models.ArticleType, on=(db_models.ArticleOrder.article == db_models.ArticleType.id))
                  .group_by(db_models.Team.id).where(db_models.Team.id == team_id)).get_or_none()

@@ -106,9 +106,9 @@ on conflict do nothing;
 
 create table if not exists "food_order"
 (
-    id     serial primary key,
-    player integer references "player" on delete cascade,
-    food   integer references "food_type" on delete cascade
+    "id"     serial primary key,
+    "player" integer references "player" on delete cascade,
+    "food"   integer references "food_type" on delete cascade
 );
 
 create table if not exists "article_type"
@@ -131,7 +131,7 @@ create table if not exists "article_order"
     CONSTRAINT "article_order_team_article_key" UNIQUE ("team", "article")
 );
 
-insert into "article_type" (name, description, image, available_quantity, max_order_quantity, price)
+insert into "article_type" ("name", "description", "image", "available_quantity", "max_order_quantity", "price")
 values ('airLAN Energy', 'Offizieller Energy Drink der airLAN', '/static/images/airlan23/energy.webp', 80, 20, 1.5)
 on conflict do nothing;
 
