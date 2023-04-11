@@ -1,9 +1,10 @@
 import os
+from playhouse.pool import PooledPostgresqlExtDatabase
 from peewee import *
 
 
 
-database = PostgresqlDatabase(os.getenv('POSTGRES_DB', 'postgres'), **{'host': os.getenv('POSTGRES_DB_HOST', 'db'), 'port': int(os.getenv('POSTGRES_DB_PORT', '5432')), 'user': os.getenv('POSTGRES_USER', 'postgres'), 'password': os.getenv('POSTGRES_PASSWORD', 'pass')})
+database = PooledPostgresqlExtDatabase(os.getenv('POSTGRES_DB', 'postgres'), max_connections=int(os.getenv('POSTGRES_DB_POOL_CONNS', '2')), stale_timeout=300, **{'host': os.getenv('POSTGRES_DB_HOST', 'db'), 'port': int(os.getenv('POSTGRES_DB_PORT', '5432')), 'user': os.getenv('POSTGRES_USER', 'postgres'), 'password': os.getenv('POSTGRES_PASSWORD', 'pass')})
 
 
 class UnknownField(object):
@@ -17,6 +18,62 @@ class BaseModel(Model):
     class Meta:
 
         database = database
+
+
+
+class YoyoLog(BaseModel):
+
+    comment = CharField(null=True)
+
+    created_at_utc = DateTimeField(null=True)
+
+    hostname = CharField(null=True)
+
+    id = CharField(primary_key=True)
+
+    migration_hash = CharField(null=True)
+
+    migration_id = CharField(null=True)
+
+    operation = CharField(null=True)
+
+    username = CharField(null=True)
+
+
+
+    class Meta:
+
+        table_name = '_yoyo_log'
+
+
+
+class YoyoMigration(BaseModel):
+
+    applied_at_utc = DateTimeField(null=True)
+
+    migration_hash = CharField(primary_key=True)
+
+    migration_id = CharField(null=True)
+
+
+
+    class Meta:
+
+        table_name = '_yoyo_migration'
+
+
+
+class YoyoVersion(BaseModel):
+
+    installed_at_utc = DateTimeField(null=True)
+
+    version = AutoField()
+
+
+
+    class Meta:
+
+        table_name = '_yoyo_version'
 
 
 
@@ -224,6 +281,18 @@ class Match(BaseModel):
 
 
 
+class Secrets(BaseModel):
+
+    blabla = CharField(primary_key=True)
+
+
+
+    class Meta:
+
+        table_name = 'secrets'
+
+
+
 class Server(BaseModel):
 
     container_name = TextField(null=True)
@@ -279,5 +348,21 @@ class TeamAssignment(BaseModel):
         )
 
         primary_key = CompositeKey('player', 'team')
+
+
+
+class YoyoLock(BaseModel):
+
+    ctime = DateTimeField(null=True)
+
+    locked = AutoField()
+
+    pid = IntegerField()
+
+
+
+    class Meta:
+
+        table_name = 'yoyo_lock'
 
 
