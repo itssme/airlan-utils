@@ -1,11 +1,12 @@
 import logging
 import os
 import random
-from typing import List, TypeVar, Generic, Dict, Optional
+from typing import List, TypeVar, Generic, Dict, Optional, Tuple
 
 import psycopg2
 from fastapi import HTTPException
-from peewee import fn
+from peewee import fn, JOIN
+from playhouse.shortcuts import model_to_dict
 
 from utils import db_models
 from utils.rabbitmq import EmailNotification, AdminMessage
@@ -318,6 +319,44 @@ def get_team_article_order_price(team_id: int) -> float:
     return price_sum.price_sum
 
 
+def get_order_details(user: db_models.Account) -> Tuple[Dict, Dict, Dict, Dict, Dict]:
+    team = model_to_dict(db_models.Team.get(db_models.Team.id == get_team_id_by_account(user.username)),
+                         recurse=False)
+    team["pizza_price"] = get_team_food_order_price(team["id"])
+    team["article_price"] = get_team_article_order_price(team["id"])
+    team["registration_fee"] = get_team_registration_fee(team["id"])
+
+    food_orders = db_models.FoodType.select().join(db_models.FoodOrder,
+                                                   on=(db_models.FoodOrder.food == db_models.FoodType.id)).join(
+        db_models.Player, on=(db_models.Player.id == db_models.FoodOrder.player)).join(db_models.TeamAssignment,
+                                                                                       on=(
+                                                                                               db_models.TeamAssignment.player == db_models.Player.id)).where(
+        db_models.TeamAssignment.team == team["id"]).where(db_models.FoodType.id != 1)
+
+    food_types = db_models.FoodType.select().order_by(
+        db_models.FoodType.id)
+
+    article_orders = (db_models.ArticleType
+                      .select(db_models.ArticleType.name, db_models.ArticleType.price,
+                              db_models.ArticleOrder.quantity)
+                      .join(db_models.ArticleOrder, on=(db_models.ArticleOrder.article == db_models.ArticleType.id))
+                      .join(db_models.Team, on=(db_models.ArticleOrder.team == db_models.Team.id))
+                      .where(db_models.Team.id == team["id"]))
+
+    article_types = (db_models.ArticleType
+                     .select(db_models.ArticleType.id, db_models.ArticleType.name,
+                             db_models.ArticleType.description, db_models.ArticleType.image,
+                             db_models.ArticleType.available_quantity,
+                             (db_models.ArticleOrder.quantity * 1).alias("quantity"),  # wtf, peewee?
+                             (db_models.ArticleOrder.quantity * db_models.ArticleType.price).alias("total_price"))
+                     .join(db_models.ArticleOrder, JOIN.LEFT_OUTER, on=(
+            (db_models.ArticleType.id == db_models.ArticleOrder.article_id) & (
+            db_models.ArticleOrder.team == team["id"])))
+                     .order_by(db_models.ArticleType.id))
+
+    return team, food_orders, food_types, article_orders, article_types
+
+
 def get_todos(username: str) -> List[Dict]:
     team_id = get_team_id_by_account(username)
 
@@ -429,7 +468,6 @@ def get_rules():
                 "Modifikationen, die innerhalb des CSGO Clients stattfinden, wie unter anderem Jump-Throw-Binds, sind erlaubt.",
                 "Das Angreifen des Servers oder der Clients anderer Spieler ist verboten, dazu zählen insbesondere, DDOS Attacken oder ähnliches.",
                 "Wenn ein Spieler des Teams gegen die Regeln des §5 verstößt, wird das gesamte Team disqualifiziert und der Spieler wird für alle zukünftigen Turniere gesperrt.",
-                "Sollte ein Spieler wegen eines Verstoßes gegen die Regeln des §6 disqualifiziert werden, behalten wir es uns als Veranstalter vor, den betreffenden Spieler nach § 146 StGB wegen Betrugs anzuzeigen.",
             ]
          },
     ]
