@@ -171,19 +171,6 @@ def delete_server(server_id: int):
             cursor.execute("delete from server where id = %s", (server_id,))
 
 
-def get_matches() -> List[Match]:
-    with psycopg2.connect(
-            host=os.getenv("POSTGRES_DB_HOST", "db"),
-            port=int(os.getenv('POSTGRES_DB_PORT', '5432')),
-            database=os.getenv('POSTGRES_DB', 'postgres'),
-            user=os.getenv('POSTGRES_USER', 'postgres'),
-            password=os.getenv("POSTGRES_PASSWORD", "pass")) as conn:
-        with conn.cursor() as cursor:
-            cursor.execute("select * from match")
-            matches = cursor.fetchall()
-            return [DbObjImpl[Match]().from_tuple(match) for match in matches]
-
-
 def get_match_by_id(match_id: int) -> Match:
     with psycopg2.connect(
             host=os.getenv("POSTGRES_DB_HOST", "db"),
