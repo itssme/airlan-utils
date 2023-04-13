@@ -1,10 +1,9 @@
 import os
-from playhouse.pool import PooledPostgresqlExtDatabase
 from peewee import *
 
 
 
-database = PooledPostgresqlExtDatabase(os.getenv('POSTGRES_DB', 'postgres'), max_connections=int(os.getenv('POSTGRES_DB_POOL_CONNS', '2')), stale_timeout=300, **{'host': os.getenv('POSTGRES_DB_HOST', 'db'), 'port': int(os.getenv('POSTGRES_DB_PORT', '5432')), 'user': os.getenv('POSTGRES_USER', 'postgres'), 'password': os.getenv('POSTGRES_PASSWORD', 'pass')})
+database = PostgresqlDatabase(os.getenv('POSTGRES_DB', 'postgres'), **{'host': os.getenv('POSTGRES_DB_HOST', 'db'), 'port': int(os.getenv('POSTGRES_DB_PORT', '5432')), 'user': os.getenv('POSTGRES_USER', 'postgres'), 'password': os.getenv('POSTGRES_PASSWORD', 'pass')})
 
 
 class UnknownField(object):
@@ -278,18 +277,6 @@ class Match(BaseModel):
     class Meta:
 
         table_name = 'match'
-
-
-
-class Secrets(BaseModel):
-
-    blabla = CharField(primary_key=True)
-
-
-
-    class Meta:
-
-        table_name = 'secrets'
 
 
 
