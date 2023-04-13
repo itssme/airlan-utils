@@ -1,9 +1,31 @@
 import os
+from contextvars import ContextVar
+
+import peewee
 from peewee import *
 
+db_state_default = {"closed": None, "conn": None, "ctx": None, "transactions": None}
+db_state = ContextVar("db_state", default=db_state_default.copy())
 
 
-database = PostgresqlDatabase(os.getenv('POSTGRES_DB', 'postgres'), **{'host': os.getenv('POSTGRES_DB_HOST', 'db'), 'port': int(os.getenv('POSTGRES_DB_PORT', '5432')), 'user': os.getenv('POSTGRES_USER', 'postgres'), 'password': os.getenv('POSTGRES_PASSWORD', 'pass')})
+class PeeweeConnectionState(peewee._ConnectionState):
+    def __init__(self, **kwargs):
+        super().__setattr__("_state", db_state)
+        super().__init__(**kwargs)
+
+    def __setattr__(self, name, value):
+        self._state.get()[name] = value
+
+    def __getattr__(self, name):
+        return self._state.get()[name]
+
+
+database = PostgresqlDatabase(os.getenv('POSTGRES_DB', 'postgres'),
+                              **{'host': os.getenv('POSTGRES_DB_HOST', 'db'),
+                                 'port': int(os.getenv('POSTGRES_DB_PORT', '5432')),
+                                 'user': os.getenv('POSTGRES_USER', 'postgres'),
+                                 'password': os.getenv('POSTGRES_PASSWORD', 'pass')})
+database._state = PeeweeConnectionState()
 
 
 class UnknownField(object):
@@ -11,17 +33,12 @@ class UnknownField(object):
     def __init__(self, *_, **__): pass
 
 
-
 class BaseModel(Model):
-
     class Meta:
-
         database = database
 
 
-
 class YoyoLog(BaseModel):
-
     comment = CharField(null=True)
 
     created_at_utc = DateTimeField(null=True)
@@ -38,46 +55,31 @@ class YoyoLog(BaseModel):
 
     username = CharField(null=True)
 
-
-
     class Meta:
-
         table_name = '_yoyo_log'
 
 
-
 class YoyoMigration(BaseModel):
-
     applied_at_utc = DateTimeField(null=True)
 
     migration_hash = CharField(primary_key=True)
 
     migration_id = CharField(null=True)
 
-
-
     class Meta:
-
         table_name = '_yoyo_migration'
 
 
-
 class YoyoVersion(BaseModel):
-
     installed_at_utc = DateTimeField(null=True)
 
     version = AutoField()
 
-
-
     class Meta:
-
         table_name = '_yoyo_version'
 
 
-
 class Account(BaseModel):
-
     password = TextField()
 
     password_reset_token = TextField(null=True)
@@ -90,16 +92,11 @@ class Account(BaseModel):
 
     verified = IntegerField(constraints=[SQL("DEFAULT 0")], null=True)
 
-
-
     class Meta:
-
         table_name = 'account'
 
 
-
 class ArticleType(BaseModel):
-
     available_quantity = IntegerField()
 
     description = TextField()
@@ -112,16 +109,11 @@ class ArticleType(BaseModel):
 
     price = DoubleField()
 
-
-
     class Meta:
-
         table_name = 'article_type'
 
 
-
 class Team(BaseModel):
-
     account = ForeignKeyField(column_name='account', field='username', model=Account)
 
     competing = IntegerField(constraints=[SQL("DEFAULT 2")], null=True)
@@ -144,26 +136,21 @@ class Team(BaseModel):
 
     verified = IntegerField(constraints=[SQL("DEFAULT 0")], null=True)
 
-
-
     class Meta:
-
         table_name = 'team'
 
 
-
 class ArticleOrder(BaseModel):
-
-    article = ForeignKeyField(column_name='article', constraints=[SQL("DEFAULT nextval('article_order_article_seq'::regclass)")], field='id', model=ArticleType)
+    article = ForeignKeyField(column_name='article',
+                              constraints=[SQL("DEFAULT nextval('article_order_article_seq'::regclass)")], field='id',
+                              model=ArticleType)
 
     quantity = IntegerField()
 
-    team = ForeignKeyField(column_name='team', constraints=[SQL("DEFAULT nextval('article_order_team_seq'::regclass)")], field='id', model=Team)
-
-
+    team = ForeignKeyField(column_name='team', constraints=[SQL("DEFAULT nextval('article_order_team_seq'::regclass)")],
+                           field='id', model=Team)
 
     class Meta:
-
         table_name = 'article_order'
 
         indexes = (
@@ -173,39 +160,27 @@ class ArticleOrder(BaseModel):
         )
 
 
-
 class Config(BaseModel):
-
     key = TextField(primary_key=True)
 
     value = TextField()
 
-
-
     class Meta:
-
         table_name = 'config'
 
 
-
 class FoodType(BaseModel):
-
     description = TextField()
 
     name = TextField()
 
     price = DoubleField()
 
-
-
     class Meta:
-
         table_name = 'food_type'
 
 
-
 class Player(BaseModel):
-
     avatar_url = TextField()
 
     last_updated = IntegerField(constraints=[SQL("DEFAULT 0")], null=True)
@@ -218,42 +193,27 @@ class Player(BaseModel):
 
     steam_name = TextField()
 
-
-
     class Meta:
-
         table_name = 'player'
 
 
-
 class FoodOrder(BaseModel):
-
     food = ForeignKeyField(column_name='food', field='id', model=FoodType, null=True)
 
     player = ForeignKeyField(column_name='player', field='id', model=Player, null=True)
 
-
-
     class Meta:
-
         table_name = 'food_order'
 
 
-
 class Host(BaseModel):
-
     ip = TextField(primary_key=True)
 
-
-
     class Meta:
-
         table_name = 'host'
 
 
-
 class Match(BaseModel):
-
     best_out_of = IntegerField()
 
     finished = IntegerField(constraints=[SQL("DEFAULT '-1'::integer")], null=True)
@@ -272,60 +232,43 @@ class Match(BaseModel):
 
     team2 = ForeignKeyField(backref='team_team2_set', column_name='team2', field='id', model=Team, null=True)
 
-
-
     class Meta:
-
         table_name = 'match'
 
 
-
 class Server(BaseModel):
-
     container_name = TextField(null=True)
 
     gslt_token = TextField(null=True)
 
-    ip = ForeignKeyField(column_name='ip', constraints=[SQL("DEFAULT 'host.docker.internal'::text")], field='ip', model=Host, null=True)
+    ip = ForeignKeyField(column_name='ip', constraints=[SQL("DEFAULT 'host.docker.internal'::text")], field='ip',
+                         model=Host, null=True)
 
     match = ForeignKeyField(column_name='match', field='id', model=Match, null=True)
 
     port = IntegerField(constraints=[SQL("DEFAULT '-1'::integer")], null=True)
 
-
-
     class Meta:
-
         table_name = 'server'
 
 
-
 class Stats(BaseModel):
-
     match = ForeignKeyField(column_name='match', field='id', model=Match, null=True)
 
     player = ForeignKeyField(column_name='player', field='id', model=Player, null=True)
 
     type = IntegerField()
 
-
-
     class Meta:
-
         table_name = 'stats'
 
 
-
 class TeamAssignment(BaseModel):
-
     player = ForeignKeyField(column_name='player', field='id', model=Player)
 
     team = ForeignKeyField(column_name='team', field='id', model=Team)
 
-
-
     class Meta:
-
         table_name = 'team_assignment'
 
         indexes = (
@@ -337,19 +280,12 @@ class TeamAssignment(BaseModel):
         primary_key = CompositeKey('player', 'team')
 
 
-
 class YoyoLock(BaseModel):
-
     ctime = DateTimeField(null=True)
 
     locked = AutoField()
 
     pid = IntegerField()
 
-
-
     class Meta:
-
         table_name = 'yoyo_lock'
-
-

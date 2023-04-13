@@ -4,12 +4,26 @@ import random
 from typing import List, TypeVar, Generic, Dict, Optional, Tuple
 
 import psycopg2
-from fastapi import HTTPException
+from fastapi import HTTPException, Depends
 from peewee import fn, JOIN
 from playhouse.shortcuts import model_to_dict
 
 from utils import db_models
 from utils.rabbitmq import EmailNotification, AdminMessage
+
+
+async def reset_db_state():
+    db_models.database._state._state.set(db_models.db_state_default.copy())
+    db_models.database._state.reset()
+
+
+def get_db(db_state=Depends(reset_db_state)):
+    try:
+        db_models.database.connect()
+        yield
+    finally:
+        if not db_models.database.is_closed():
+            db_models.database.close()
 
 
 class DbObject(object):
