@@ -390,7 +390,7 @@ def get_todos(username: str) -> List[Dict]:
         {  # team name
             "completed": team_name_completed,
             "title": "Team Namen Angeben",
-            "desc": "Gib den Namen und den Tag deinen Teams an.",
+            "desc": "Gib den Namen und den Tag deines Teams an.",
             "route": "/public/team/registration",
             "display_only": team.locked_changes == 1
         },
