@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union, Optional
 
 from pydantic import BaseModel
 
@@ -22,10 +22,10 @@ class SlayPlayer(BaseModel):
 class MatchInfo(BaseModel):
     team1: int
     team2: int
-    best_of: Union[int, None] = None
-    check_auths: Union[bool, None] = None
-    host: Union[str, None] = None
-    from_backup_url: Union[str, None] = None
+    best_of: Optional[int] = None
+    check_auths: Optional[bool] = None
+    host: Optional[str] = None
+    from_backup_url: Optional[str] = None
 
 
 class TeamInfo(BaseModel):

@@ -273,7 +273,7 @@ def get_rules():
 
 def get_least_used_host_ips() -> str:
     cursor = db_models.database.execute_sql(
-        "select host.ip, host.id from host left join server on host.ip = server.ip group by host.ip order by count(server.ip) asc")
+        "select host.ip from host left join server on host.ip = server.ip group by host.ip order by count(server.ip) asc")
     result: List[Tuple[str, int]] = list(cursor.fetchall())
 
     if len(result) == 0:
