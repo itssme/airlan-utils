@@ -8,3 +8,4 @@ def sanitize_header_cookies(request_headers: dict) -> dict:
 
 async def get_body(request: Request):
     return await request.body()
+
