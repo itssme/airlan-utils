@@ -28,6 +28,10 @@ class MatchInfo(BaseModel):
     from_backup_url: Optional[str] = None
 
 
+class HostInfo(BaseModel):
+    ip: str
+
+
 class TeamInfo(BaseModel):
     name: str
     tag: str
