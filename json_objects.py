@@ -30,6 +30,7 @@ class MatchInfo(BaseModel):
 
 class HostInfo(BaseModel):
     ip: str
+    port: int
 
 
 class TeamInfo(BaseModel):
