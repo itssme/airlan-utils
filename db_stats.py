@@ -1,6 +1,12 @@
-from typing import Tuple, List
+from typing import Tuple, List, Dict
 from utils import db_models
 from utils.stat_events import Events
+
+
+def count_all_events() -> List[Tuple[int, int]]:
+    cursor = db_models.database.execute_sql("select type, count(*) from stats group by type")
+    result: List[Tuple[int, int]] = list(cursor.fetchall())
+    return result
 
 
 def count_event_type(event: Events) -> int:
