@@ -1,16 +1,15 @@
-import logging
 import os
 from typing import List, Optional
 
 import requests
 
 from utils import db, db_models
+import logging
 
 STEAM_API_KEY = os.getenv("STEAM_KEY", "DEV")
 
 if STEAM_API_KEY == "DEV":
     logging.warning("No steam api key found, disabling steam features")
-
 
 def steam_id_to_community_id(steam_id: str) -> Optional[str]:
     if steam_id is None:
