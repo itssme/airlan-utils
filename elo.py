@@ -24,8 +24,7 @@ def actual_result(team1_score, team2_score):
     return [wl, wa]
 
 
-def calculate_elo(team1_elo, team2_elo, team1_score, team2_score):
-    k = 60  # TODO: balance
+def calculate_elo(team1_elo, team2_elo, team1_score, team2_score, k=60):
     if team1_score > team2_score:
         ELOW = team1_elo
         ELOL = team2_elo
