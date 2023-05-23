@@ -278,7 +278,7 @@ def get_least_used_host_ips() -> str:
 
     if len(result) == 0:
         logging.error("No available hosts found to host a game")
-        raise Exception("No available hosts found to host a game")
+        raise ValueError("No available hosts found to host a game")
 
     logging.info(f"Least used host ips: {result}")
 
