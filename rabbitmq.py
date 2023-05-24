@@ -27,14 +27,17 @@ class MQMessage:
             logging.error("Tried to send empty message")
             return
 
-        declare_queues()
-        with RabbitMQConn() as connection:
-            channel = connection.channel()
-            channel.basic_publish(exchange='',
-                                  routing_key=self.queue.value,
-                                  body=self.message.encode("utf-8"))
-            logging.info(f"Sent message: {self.message} to {self.queue.value}")
-
+        try:
+            declare_queues()
+            with RabbitMQConn() as connection:
+                channel = connection.channel()
+                channel.basic_publish(exchange='',
+                                      routing_key=self.queue.value,
+                                      body=self.message.encode("utf-8"))
+                logging.info(f"Sent message: {self.message} to {self.queue.value}")
+        except Exception as e:
+            logging.error(f"Failed to send message: {self.message} to {self.queue.value}")
+            logging.error(e)
 
 class EmailNotification(MQMessage):
     def __init__(self):
