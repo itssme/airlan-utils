@@ -20,8 +20,7 @@ class RCON(RconConnection):
 def get5_status(server_ip: str, server_port: int) -> Dict:
     with RCON(server_ip, server_port) as rconn:
         get5_stats: str = rconn.exec_command("get5_status")
-        get5_stats = get5_stats[get5_stats.find("{"):(get5_stats.rfind("}") + 1)].replace("\\n", "").replace(
-            "TEACHERS'R'US", "TEACHERS\'R\'US")
+        get5_stats = get5_stats[get5_stats.find("{"):(get5_stats.rfind("}") + 1)].replace("\\n", "")
         logging.info("Get5 stats: " + get5_stats)
         get5_stats: Dict = json.loads(get5_stats)
         return get5_stats
