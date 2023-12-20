@@ -42,9 +42,9 @@ def calculate_elo(team1_elo, team2_elo, team1_score, team2_score, k=60):
     return int(elo_ln), int(elo_vn)
 
 
-csgo_rank_dist = [1.6, 2.9, 2.7, 3.6, 4.9, 6.0, 7.2, 8.2, 8.9, 9.4, 9.0, 8.3, 7.2, 6.1, 4.8, 4.9, 3.1, 1.3]
-csgo_elo_dist = [1000 + (600 * sum(csgo_rank_dist[:i + 1])) / 100 for i in range(0, len(csgo_rank_dist))]
-print(csgo_elo_dist)
+cs2_rank_dist = [1.6, 2.9, 2.7, 3.6, 4.9, 6.0, 7.2, 8.2, 8.9, 9.4, 9.0, 8.3, 7.2, 6.1, 4.8, 4.9, 3.1, 1.3]
+cs2_elo_dist = [1000 + (600 * sum(cs2_rank_dist[:i + 1])) / 100 for i in range(0, len(cs2_rank_dist))]
+print(cs2_elo_dist)
 
 
 class CSRank(Enum):
@@ -69,7 +69,7 @@ class CSRank(Enum):
 
 
 def calculate_team_elo(team_ranks: List[CSRank]):
-    return sum([csgo_elo_dist[rank.value] for rank in team_ranks]) / len(team_ranks)
+    return sum([cs2_elo_dist[rank.value] for rank in team_ranks]) / len(team_ranks)
 
 
 def main():

@@ -256,13 +256,13 @@ def get_rules():
                 "Die Regeln des Turniers werden auf dieser Plattform veröffentlicht und können jederzeit geändert werden.",
                 "Alle Spiele werden aufgenommen und die Demo Dateien anschliessend veröffentlicht.",
                 "Der Teamleiter hat all seine Spieler über die hier veröffentlichen Regeln zu Unterrichten. Unwissenheit über Regeln sind dem Team anzulasten.",
-                "Teams, welche sich unsportliche Verhalten, oder andere Spieler oder Teams, in einer verletzenden Art und Weise beleidigen, welche selbst für den in CSGO herrschenden rauen Umgangston unüblich ist, werden bis zu 250 ELO Punkte abgezogen, oder in besonders schwerwiegenden Fällen vom Turnier ausgeschlossen.",
+                "Teams, welche sich unsportliche Verhalten, oder andere Spieler oder Teams, in einer verletzenden Art und Weise beleidigen, welche selbst für den in cs2 herrschenden rauen Umgangston unüblich ist, werden bis zu 250 ELO Punkte abgezogen, oder in besonders schwerwiegenden Fällen vom Turnier ausgeschlossen.",
             ]
          },
         {"id": 6, "rule": "Turnierausschluss", "subrules":
             [
-                "Alle Programme oder andere nicht technischen Hilfsmittel, welche einem Spieler, oder einem Team als ganzes, einen Vorteil gegenüber anderen Teams verschaffen, sind verboten. Ausgenommen sind Programme welche im allgemeinen Verständnis der CSGO Spieler nicht als Cheats angesehen werden, wie unter anderem Programme zur Kommunikation mit den anderen Spielern außerhalb des ingame-chats, wie Discord oder Teamspeak.",
-                "Modifikationen, die innerhalb des CSGO Clients stattfinden, wie unter anderem Jump-Throw-Binds, sind erlaubt.",
+                "Alle Programme oder andere nicht technischen Hilfsmittel, welche einem Spieler, oder einem Team als ganzes, einen Vorteil gegenüber anderen Teams verschaffen, sind verboten. Ausgenommen sind Programme welche im allgemeinen Verständnis der cs2 Spieler nicht als Cheats angesehen werden, wie unter anderem Programme zur Kommunikation mit den anderen Spielern außerhalb des ingame-chats, wie Discord oder Teamspeak.",
+                "Modifikationen, die innerhalb des cs2 Clients stattfinden, wie unter anderem Jump-Throw-Binds, sind erlaubt.",
                 "Das Angreifen des Servers oder der Clients anderer Spieler ist verboten, dazu zählen insbesondere, DDOS Attacken oder ähnliches.",
                 "Wenn ein Spieler des Teams gegen die Regeln des §5 verstößt, wird das gesamte Team disqualifiziert und der Spieler wird für alle zukünftigen Turniere gesperrt.",
             ]
