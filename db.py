@@ -283,3 +283,10 @@ def get_least_used_host_ips() -> str:
     logging.info(f"Least used host ips: {result}")
 
     return random.choice(result)[0]
+
+
+def get_default_template_values() -> Dict:
+    config: db_models.Config
+    return {
+        "config": {config.key: config.value for config in db_models.Config.select()}
+    }
