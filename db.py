@@ -225,44 +225,41 @@ def get_rules():
                 "Ein Spieler kann nur in einem Team sein.",
                 "Jedes Team hat einen Teamleiter. Dieser muss das Team auf dieser Plattform registrieren.",
                 "Der Teamleader ist für das Auswählen der Karten während des Spiels verantwortlich.",
-                "Im Tunier werden zehn Teams gegeneinandern antreten."
+                "Im Tunier werden 12 Teams gegeneinandern antreten."
             ]
          },
-        {"id": 2, "rule": "ELO-System", "subrules":
+        {"id": 2, "rule": "Finale", "subrules":
             [
-                "Jedes Team hat einen ELO-Wert, der die Stärke des Teams angibt. Alle Teams starten mit einem ELO Wert von 1000.",
-                "Nach jedem Spiel wird der ELO-Wert des Teams angepasst. Dabei wird der ELO-Wert des Gegners berücksichtigt, sowie der Unterschied der Scores. (ähnlich wie bei der ELO-Ratingliste im Schach)"
+                "Die besten zwei Teams (jene die Gewinner des Halbfinales aus Gruppe A) spielen im Finale gegeneinander.",
+                "Das Finale wird ein Best-of-Three Match zwischen den beiden Teams sein, welches für alle anderen Tunierteilnehmer übertragen wird."
             ]
          },
-        {"id": 3, "rule": "Finale", "subrules":
+        {"id": 3, "rule": "Spielmodus", "subrules":
             [
-                "Die besten zwei Teams (jene mit der höchsten ELO) spielen im Finale gegeneinander.",
-                "Das Finale wird ein normales Match zwischen den beiden Teams sein, welches für alle anderen Tunierteilnehmer übertragen wird."
-            ]
-         },
-        {"id": 4, "rule": "Spielmodus", "subrules":
-            [
-                "Das Turnier wird im ELO-System begonnen.",
-                "Jedes Spiel wird in einem Best-of-One Modus gespielt.",
+                "Das Turnier wird im 'jeder gegen jeden' Modus begonnen.",
+                "In der zweiten Phase, werden die Teams in zwei Gruppen aufgeteilt, in denen sie jeweils gegen jedes andere Team in ihrer Gruppe spielen.",
+                "In Gruppe A spielen die Teams, welche die meisten Punkte in der ersten Phase gesammelt haben. In Gruppe B spielen die Teams, welche die wenigsten Punkte in der ersten Phase gesammelt haben.",
+                "Das Halbfinale wird zwischen den vier besten Teams aus Gruppe A gespielt (1. gegen 4. und 2. gegen 3.).",
+                "Jedes Spiel wird in einem Best-of-One Modus gespielt. (Außer das Finale, welches im Best-of-Three Modus gespielt wird.)",
                 "Die Karten werden vor dem Spiel in einem Veto System von den Teamleitern ausgewählt.",
                 "Danach wird eine Knife Runde auf der Map gespielt. Der Gewinner der Knife Runde entscheidet, welche Seite er spielen möchte. (CT oder T)",
-                "Alle Maps werden im Bomb-Defuse Modus gespielt, bis auf Agency, welche im Hostage Modus gespielt wird.",
-                "Bei einem Unentschieden wird eine Overtime gespielt, bei der beide Teams im Spiel mit 10.000$ starten und sechs Runden spielen müssen.",
-                "Sollte es nach den sechsten Runden wieder ein Unentschieden geben, wird eine weitere Overtime gespielt, bei der wieder beide Teams im Spiel mit 10.000$ starten und 6 Runden spielen müssen."
+                "Alle Maps werden im Bomb-Defuse Modus gespielt, bis auf Office, welche im Hostage Modus gespielt wird.",
+                # "Bei einem Unentschieden wird eine Overtime gespielt, bei der beide Teams im Spiel mit 10.000$ starten und sechs Runden spielen müssen.",
+                # "Sollte es nach den sechsten Runden wieder ein Unentschieden geben, wird eine weitere Overtime gespielt, bei der wieder beide Teams im Spiel mit 10.000$ starten und 6 Runden spielen müssen."
             ]
          },
-        {"id": 5, "rule": "Allgemeine Turnierregeln", "subrules":
+        {"id": 4, "rule": "Allgemeine Turnierregeln", "subrules":
             [
                 "Die Regeln des Turniers werden auf dieser Plattform veröffentlicht und können jederzeit geändert werden.",
                 "Alle Spiele werden aufgenommen und die Demo Dateien anschliessend veröffentlicht.",
                 "Der Teamleiter hat all seine Spieler über die hier veröffentlichen Regeln zu Unterrichten. Unwissenheit über Regeln sind dem Team anzulasten.",
-                "Teams, welche sich unsportliche Verhalten, oder andere Spieler oder Teams, in einer verletzenden Art und Weise beleidigen, welche selbst für den in cs2 herrschenden rauen Umgangston unüblich ist, werden bis zu 250 ELO Punkte abgezogen, oder in besonders schwerwiegenden Fällen vom Turnier ausgeschlossen.",
+                "Teams, welche sich unsportliche Verhalten, oder andere Spieler oder Teams, in einer verletzenden Art und Weise beleidigen, welche selbst für den in CS2 herrschenden rauen Umgangston unüblich ist, können gewonnene Spiele gestrichen werden, oder in besonders schwerwiegenden Fällen vom Turnier ausgeschlossen.",
             ]
          },
-        {"id": 6, "rule": "Turnierausschluss", "subrules":
+        {"id": 5, "rule": "Turnierausschluss", "subrules":
             [
                 "Alle Programme oder andere nicht technischen Hilfsmittel, welche einem Spieler, oder einem Team als ganzes, einen Vorteil gegenüber anderen Teams verschaffen, sind verboten. Ausgenommen sind Programme welche im allgemeinen Verständnis der cs2 Spieler nicht als Cheats angesehen werden, wie unter anderem Programme zur Kommunikation mit den anderen Spielern außerhalb des ingame-chats, wie Discord oder Teamspeak.",
-                "Modifikationen, die innerhalb des cs2 Clients stattfinden, wie unter anderem Jump-Throw-Binds, sind erlaubt.",
+                "Modifikationen, die innerhalb des CS2 Clients stattfinden, wie unter anderem Jump-Throw-Binds, sind erlaubt.",
                 "Das Angreifen des Servers oder der Clients anderer Spieler ist verboten, dazu zählen insbesondere, DDOS Attacken oder ähnliches.",
                 "Wenn ein Spieler des Teams gegen die Regeln des §5 verstößt, wird das gesamte Team disqualifiziert und der Spieler wird für alle zukünftigen Turniere gesperrt.",
             ]
