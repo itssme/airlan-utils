@@ -240,7 +240,7 @@ def get_rules():
                 "In der zweiten Phase, werden die Teams in zwei Gruppen aufgeteilt, in denen sie jeweils gegen jedes andere Team in ihrer Gruppe spielen.",
                 "In Gruppe A spielen die Teams, welche die meisten Punkte in der ersten Phase gesammelt haben. In Gruppe B spielen die Teams, welche die wenigsten Punkte in der ersten Phase gesammelt haben.",
                 "Das Halbfinale wird zwischen den vier besten Teams aus Gruppe A gespielt (1. gegen 4. und 2. gegen 3.).",
-                "Im Finale treten die Gewinner des Halbfinales aus Gruppe A gegeneinander an."
+                "Im Finale treten die Gewinner des Halbfinales aus Gruppe A gegeneinander an.",
                 "Jedes Spiel wird in einem Best-of-One Modus gespielt. (Außer das Finale, welches im Best-of-Three Modus gespielt wird.)",
                 "Die Karten werden vor dem Spiel in einem Veto System von den Teamleitern ausgewählt.",
                 "Danach wird eine Knife Runde auf der Map gespielt. Der Gewinner der Knife Runde entscheidet, welche Seite er spielen möchte. (CT oder T)",
