@@ -283,8 +283,14 @@ def get_least_used_host_ips() -> str:
     return random.choice(result)[0]
 
 
+PRODUCTION = False if os.getenv("PRODUCTION", "0") == "0" else True
+
+
 def get_default_template_values() -> Dict:
+    logging.info("production is: " + str(PRODUCTION) + " is: " + str(os.getenv("PRODUCTION", "0")))
+
     config: db_models.Config
     return {
-        "config": {config.key: config.value for config in db_models.Config.select()}
+        "config": {config.key: config.value for config in db_models.Config.select()},
+        "production": PRODUCTION
     }
