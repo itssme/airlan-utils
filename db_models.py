@@ -202,6 +202,70 @@ class ArticleOrder(BaseModel):
 
 
 
+class Map(BaseModel):
+
+    description = TextField(constraints=[SQL("DEFAULT ''::text")], null=True)
+
+    image = CharField()
+
+    name = CharField()
+
+
+
+    class Meta:
+
+        table_name = 'map'
+
+
+
+class Beo1Vote(BaseModel):
+
+    ban_1 = ForeignKeyField(column_name='ban_1', field='id', model=Map, null=True)
+
+    ban_2 = ForeignKeyField(backref='map_ban_2_set', column_name='ban_2', field='id', model=Map, null=True)
+
+    ban_3 = ForeignKeyField(backref='map_ban_3_set', column_name='ban_3', field='id', model=Map, null=True)
+
+    ban_4 = ForeignKeyField(backref='map_ban_4_set', column_name='ban_4', field='id', model=Map, null=True)
+
+    ban_5 = ForeignKeyField(backref='map_ban_5_set', column_name='ban_5', field='id', model=Map, null=True)
+
+    ban_6 = ForeignKeyField(backref='map_ban_6_set', column_name='ban_6', field='id', model=Map, null=True)
+
+    pick_7 = ForeignKeyField(backref='map_pick_7_set', column_name='pick_7', field='id', model=Map, null=True)
+
+
+
+    class Meta:
+
+        table_name = 'beo1_vote'
+
+
+
+class Beo3Vote(BaseModel):
+
+    ban_1 = ForeignKeyField(column_name='ban_1', field='id', model=Map, null=True)
+
+    ban_2 = ForeignKeyField(backref='map_ban_2_set', column_name='ban_2', field='id', model=Map, null=True)
+
+    ban_5 = ForeignKeyField(backref='map_ban_5_set', column_name='ban_5', field='id', model=Map, null=True)
+
+    ban_6 = ForeignKeyField(backref='map_ban_6_set', column_name='ban_6', field='id', model=Map, null=True)
+
+    pick_3 = ForeignKeyField(backref='map_pick_3_set', column_name='pick_3', field='id', model=Map, null=True)
+
+    pick_4 = ForeignKeyField(backref='map_pick_4_set', column_name='pick_4', field='id', model=Map, null=True)
+
+    pick_7 = ForeignKeyField(backref='map_pick_7_set', column_name='pick_7', field='id', model=Map, null=True)
+
+
+
+    class Meta:
+
+        table_name = 'beo3_vote'
+
+
+
 class Config(BaseModel):
 
     key = TextField(primary_key=True)
@@ -307,6 +371,34 @@ class Match(BaseModel):
     class Meta:
 
         table_name = 'match'
+
+
+
+class ScheduledMatch(BaseModel):
+
+    beo1_vote = ForeignKeyField(column_name='beo1_vote', field='id', model=Beo1Vote, null=True)
+
+    beo3_vote = ForeignKeyField(column_name='beo3_vote', field='id', model=Beo3Vote, null=True)
+
+    best_out_of = IntegerField()
+
+    description = TextField(constraints=[SQL("DEFAULT ''::text")], null=True)
+
+    match = ForeignKeyField(column_name='match', field='id', model=Match, null=True)
+
+    match_group = IntegerField(null=True)
+
+    status = CharField(constraints=[SQL("DEFAULT 'scheduled'::character varying")], null=True)
+
+    team1 = ForeignKeyField(column_name='team1', field='id', model=Team)
+
+    team2 = ForeignKeyField(backref='team_team2_set', column_name='team2', field='id', model=Team)
+
+
+
+    class Meta:
+
+        table_name = 'scheduled_match'
 
 
 
