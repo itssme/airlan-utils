@@ -49,8 +49,7 @@ create table beo1_vote
     "ban_3"  integer references "map" ("id") default null,
     "ban_4"  integer references "map" ("id") default null,
     "ban_5"  integer references "map" ("id") default null,
-    "ban_6"  integer references "map" ("id") default null,
-    "pick_7" integer references "map" ("id") default null
+    "pick_6" integer references "map" ("id") default null
 );
 
 create table beo3_vote

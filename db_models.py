@@ -230,9 +230,7 @@ class Beo1Vote(BaseModel):
 
     ban_5 = ForeignKeyField(backref='map_ban_5_set', column_name='ban_5', field='id', model=Map, null=True)
 
-    ban_6 = ForeignKeyField(backref='map_ban_6_set', column_name='ban_6', field='id', model=Map, null=True)
-
-    pick_7 = ForeignKeyField(backref='map_pick_7_set', column_name='pick_7', field='id', model=Map, null=True)
+    pick_6 = ForeignKeyField(backref='map_pick_6_set', column_name='pick_6', field='id', model=Map, null=True)
 
 
 
