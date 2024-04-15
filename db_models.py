@@ -348,6 +348,10 @@ class Match(BaseModel):
 
     best_out_of = IntegerField()
 
+    current_score_team1 = IntegerField(constraints=[SQL("DEFAULT 0")], null=True)
+
+    current_score_team2 = IntegerField(constraints=[SQL("DEFAULT 0")], null=True)
+
     finished = IntegerField(constraints=[SQL("DEFAULT '-1'::integer")], null=True)
 
     matchid = TextField(unique=True)
@@ -422,11 +426,77 @@ class Server(BaseModel):
 
 class Stats(BaseModel):
 
+    _1k = IntegerField(column_name='1k', constraints=[SQL("DEFAULT 0")])
+
+    _1v1 = IntegerField(column_name='1v1', constraints=[SQL("DEFAULT 0")])
+
+    _1v2 = IntegerField(column_name='1v2', constraints=[SQL("DEFAULT 0")])
+
+    _1v3 = IntegerField(column_name='1v3', constraints=[SQL("DEFAULT 0")])
+
+    _1v4 = IntegerField(column_name='1v4', constraints=[SQL("DEFAULT 0")])
+
+    _1v5 = IntegerField(column_name='1v5', constraints=[SQL("DEFAULT 0")])
+
+    _2k = IntegerField(column_name='2k', constraints=[SQL("DEFAULT 0")])
+
+    _3k = IntegerField(column_name='3k', constraints=[SQL("DEFAULT 0")])
+
+    _4k = IntegerField(column_name='4k', constraints=[SQL("DEFAULT 0")])
+
+    _5k = IntegerField(column_name='5k', constraints=[SQL("DEFAULT 0")])
+
+    assists = IntegerField(constraints=[SQL("DEFAULT 0")])
+
+    bomb_defuses = IntegerField(constraints=[SQL("DEFAULT 0")])
+
+    bomb_plants = IntegerField(constraints=[SQL("DEFAULT 0")])
+
+    damage = IntegerField(constraints=[SQL("DEFAULT 0")])
+
+    deaths = IntegerField(constraints=[SQL("DEFAULT 0")])
+
+    enemies_flashed = IntegerField(constraints=[SQL("DEFAULT 0")])
+
+    first_deaths_ct = IntegerField(constraints=[SQL("DEFAULT 0")])
+
+    first_deaths_t = IntegerField(constraints=[SQL("DEFAULT 0")])
+
+    first_kills_ct = IntegerField(constraints=[SQL("DEFAULT 0")])
+
+    first_kills_t = IntegerField(constraints=[SQL("DEFAULT 0")])
+
+    flash_assists = IntegerField(constraints=[SQL("DEFAULT 0")])
+
+    friendlies_flashed = IntegerField(constraints=[SQL("DEFAULT 0")])
+
+    headshot_kills = IntegerField(constraints=[SQL("DEFAULT 0")])
+
+    kast = IntegerField(constraints=[SQL("DEFAULT 0")])
+
+    kills = IntegerField(constraints=[SQL("DEFAULT 0")])
+
+    knife_kills = IntegerField(constraints=[SQL("DEFAULT 0")])
+
+    map_number = IntegerField(constraints=[SQL("DEFAULT 0")])
+
     match = ForeignKeyField(column_name='match', field='id', model=Match, null=True)
+
+    mvp = IntegerField(constraints=[SQL("DEFAULT 0")])
 
     player = ForeignKeyField(column_name='player', field='id', model=Player, null=True)
 
-    type = IntegerField()
+    rounds_played = IntegerField(constraints=[SQL("DEFAULT 0")])
+
+    score = IntegerField(constraints=[SQL("DEFAULT 0")])
+
+    suicides = IntegerField(constraints=[SQL("DEFAULT 0")])
+
+    team_kills = IntegerField(constraints=[SQL("DEFAULT 0")])
+
+    trade_kills = IntegerField(constraints=[SQL("DEFAULT 0")])
+
+    utility_damage = IntegerField(constraints=[SQL("DEFAULT 0")])
 
 
 
